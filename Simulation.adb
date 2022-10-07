@@ -1,243 +1,249 @@
 -- Damian Jankowski s188597
 -- spotkanie warunkowe (conditional entry call)
 
-
--- A skeleton of a program for an assignment in programming languages
--- The students should rename the tasks of producers, consumers, and the buffer
--- Then, they should change them so that they would fit their assignments
--- They should also complete the code with constructions that lack there
-
-
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Integer_Text_IO; 
 with Ada.Numerics.Discrete_Random;
 
 
 procedure Simulation is
-   Number_Of_Products: constant Integer := 5;
-   Number_Of_Assemblies: constant Integer := 3;
-   Number_Of_Consumers: constant Integer := 2;
-   subtype Product_Type is Integer range 1 .. Number_Of_Products;
-   subtype Assembly_Type is Integer range 1 .. Number_Of_Assemblies;
-   subtype Consumer_Type is Integer range 1 .. Number_Of_Consumers;
-   Product_Name: constant array (Product_Type) of String(1 .. 8)
-     := ("Product1", "Product2", "Product3", "Product4", "Product5");
-   Assembly_Name: constant array (Assembly_Type) of String(1 .. 9)
-     := ("Assembly1", "Assembly2", "Assembly3");
-   package Random_Assembly is new
-     Ada.Numerics.Discrete_Random(Assembly_Type);
-   type My_Str is new String(1 ..256);
 
-   -- Producer produces determined product
-   task type Producer is
-      -- Give the Producer an identity, i.e. the product type
-      entry Start(Product: in Product_Type; Production_Time: in Integer);
-   end Producer;
+Ilosc_Produktow: constant Integer := 5;
+Ilosc_Zestawow: constant Integer := 3;
+Ilosc_Klientow: constant Integer := 3;
 
-   -- Consumer gets an arbitrary assembly of several products from the buffer
-   task type Consumer is
-      -- Give the Consumer an identity
-      entry Start(Consumer_Number: in Consumer_Type;
-		    Consumption_Time: in Integer);
-   end Consumer;
+subtype Typ_Produkt is Integer range 1 .. Ilosc_Produktow;
+subtype Typ_Zestaw is Integer range 1 .. Ilosc_Zestawow;
+subtype Typ_Klient is Integer range 1 .. Ilosc_Klientow;
 
-   -- In the Buffer, products are assemblied into an assembly
-   task type Buffer is
-      -- Accept a product to the storage provided there is a room for it
-      entry Take(Product: in Product_Type; Number: in Integer);
-      -- Deliver an assembly provided there are enough products for it
-      entry Deliver(Assembly: in Assembly_Type; Number: out Integer);
-   end Buffer;
+Nazwa_Produktu: constant array (Typ_Produkt) of String(1 .. 15)
+	:= ("Procesor       ", "Karta graficzna", "Plyta glowna   ", 
+	"Pamiec RAM     ", "Dysk HDD       ");
+Nazwa_Zestawow: constant array (Typ_Zestaw) of String(1 .. 14)
+	:= ("Budzetowy     ", "Super Komputer", "Pamieciowy    ");
+Imie_Klienta: constant array (1 .. Ilosc_Klientow) of String(1 .. 6)
+	:= ("Damian", "Maciek", "Stefan");
 
-   P: array ( 1 .. Number_Of_Products ) of Producer;
-   K: array ( 1 .. Number_Of_Consumers ) of Consumer;
-   B: Buffer;
+package Losowy_Zestaw is new
+	Ada.Numerics.Discrete_Random(Typ_Zestaw);
 
-   task body Producer is
-      subtype Production_Time_Range is Integer range 3 .. 6;
-      package Random_Production is new
-	Ada.Numerics.Discrete_Random(Production_Time_Range);
-      G: Random_Production.Generator;	--  generator liczb losowych
-      Product_Type_Number: Integer;
-      Product_Number: Integer;
-      Production: Integer;
-   begin
-      accept Start(Product: in Product_Type; Production_Time: in Integer) do
-	 Random_Production.Reset(G);	--  start random number generator
-	 Product_Number := 1;
-	 Product_Type_Number := Product;
-	 Production := Production_Time;
-      end Start;
-      Put_Line("Started producer of " & Product_Name(Product_Type_Number));
-      loop
-	 delay Duration(Random_Production.Random(G)); --  symuluj produkcję
-	 Put_Line("Produced product " & Product_Name(Product_Type_Number)
-		    & " number "  & Integer'Image(Product_Number));
-	 -- Accept for storage
-	 B.Take(Product_Type_Number, Product_Number);
-	 Product_Number := Product_Number + 1;
-      end loop;
-   end Producer;
+-- Producent produkuje produkty
+task type Producent is
+	-- Podaj producentowi nr produktu
+	entry Start(Produkt: in Typ_Produkt);
+end Producent;
 
-   task body Consumer is
-      subtype Consumption_Time_Range is Integer range 4 .. 8;
-      package Random_Consumption is new
-	Ada.Numerics.Discrete_Random(Consumption_Time_Range);
-      G: Random_Consumption.Generator;	--  random number generator (time)
-      G2: Random_Assembly.Generator;	--  also (assemblies)
-      Consumer_Nb: Consumer_Type;
-      Assembly_Number: Integer;
-      Consumption: Integer;
-      Assembly_Type: Integer;
-      Consumer_Name: constant array (1 .. Number_Of_Consumers)
-	of String(1 .. 9)
-	:= ("Consumer1", "Consumer2");
-   begin
-      accept Start(Consumer_Number: in Consumer_Type;
-		     Consumption_Time: in Integer) do
-	 Random_Consumption.Reset(G);	--  ustaw generator
-	 Random_Assembly.Reset(G2);	--  też
-	 Consumer_Nb := Consumer_Number;
-	 Consumption := Consumption_Time;
-      end Start;
-      Put_Line("Started consumer " & Consumer_Name(Consumer_Nb));
-      loop
-	 delay Duration(Random_Consumption.Random(G)); --  simulate consumption
-	 Assembly_Type := Random_Assembly.Random(G2);
-	 -- take an assembly for consumption
-	 B.Deliver(Assembly_Type, Assembly_Number);
-	 Put_Line(Consumer_Name(Consumer_Nb) & ": taken assembly " &
-		    Assembly_Name(Assembly_Type) & " number " &
-		    Integer'Image(Assembly_Number));
-      end loop;
-   end Consumer;
+-- Klient zamawia i odbiera dany zestaw
+task type Klient is
+	-- Podaj klientowi jego numer
+	entry Start(Numer_Klienta: in Typ_Klient);
+end Klient;
 
-   task body Buffer is
-      Storage_Capacity: constant Integer := 30;
-      type Storage_type is array (Product_Type) of Integer;
-      Storage: Storage_type
-	:= (0, 0, 0, 0, 0);
-      Assembly_Content: array(Assembly_Type, Product_Type) of Integer
-	:= ((2, 1, 2, 1, 2),
-	    (2, 2, 0, 1, 0),
-	    (1, 1, 2, 0, 1));
-      Max_Assembly_Content: array(Product_Type) of Integer;
-      Assembly_Number: array(Assembly_Type) of Integer
-	:= (1, 1, 1);
-      In_Storage: Integer := 0;
+-- W magazynie produkty sa skladane w zestaw
+task type Magazyn is
+	-- Odbierz produkt jesli jest miejsce
+	entry Odbierz(Produkt: in Typ_Produkt; Numer: in Integer);
+	-- Zloz zestaw jesli jest wystarczajaco produktow
+	entry Skladaj(Zestaw: in Typ_Zestaw; Numer: out Integer);
+end Magazyn;
 
-      procedure Setup_Variables is
-      begin
-	 for W in Product_Type loop
-	    Max_Assembly_Content(W) := 0;
-	    for Z in Assembly_Type loop
-	       if Assembly_Content(Z, W) > Max_Assembly_Content(W) then
-		  Max_Assembly_Content(W) := Assembly_Content(Z, W);
-	       end if;
-	    end loop;
-	 end loop;
-      end Setup_Variables;
+P: array ( 1 .. Ilosc_Produktow ) of Producent;
+K: array ( 1 .. Ilosc_Klientow ) of Klient;
+M: Magazyn;
 
-      function Can_Accept(Product: Product_Type) return Boolean is
-	 Free: Integer;		--  free room in the storage
-	 -- how many products are for production of arbitrary assembly
-	 Lacking: array(Product_Type) of Integer;
-	 -- how much room is needed in storage to produce arbitrary assembly
-	 Lacking_room: Integer;
-	 MP: Boolean;			--  can accept
-      begin
-	 if In_Storage >= Storage_Capacity then
-	    return False;
-	 end if;
-	 -- There is free room in the storage
-	 Free := Storage_Capacity - In_Storage;
-	 MP := True;
-	 for W in Product_Type loop
-	    if Storage(W) < Max_Assembly_Content(W) then
-	       MP := False;
-	    end if;
-	 end loop;
-	 if MP then
-	    return True;		--  storage has products for arbitrary
-	       				--  assembly
-	 end if;
-	 if Integer'Max(0, Max_Assembly_Content(Product) - Storage(Product)) > 0 then
-	    -- exactly this product lacks
-	    return True;
-	 end if;
-	 Lacking_room := 1;			--  insert current product
-	 for W in Product_Type loop
-	    Lacking(W) := Integer'Max(0, Max_Assembly_Content(W) - Storage(W));
-	    Lacking_room := Lacking_room + Lacking(W);
-	 end loop;
-	 if Free >= Lacking_room then
-	    -- there is enough room in storage for arbitrary assembly
-	    return True;
-	 else
-	    -- no room for this product
-	    return False;
-	 end if;
-      end Can_Accept;
+task body Producent is
 
-      function Can_Deliver(Assembly: Assembly_Type) return Boolean is
-      begin
-	 for W in Product_Type loop
-	    if Storage(W) < Assembly_Content(Assembly, W) then
-	       return False;
-	    end if;
-	 end loop;
-	 return True;
-      end Can_Deliver;
+	subtype Przedzial_Czasu_Produkcji is Integer range 2 .. 5;
 
-      procedure Storage_Contents is
-      begin
-	 for W in Product_Type loop
-	    Put_Line("Storage contents: " & Integer'Image(Storage(W)) & " "
-		       & Product_Name(W));
-	 end loop;
-      end Storage_Contents;
+	package Losuj_Czas_Produkcji is new
+		Ada.Numerics.Discrete_Random(Przedzial_Czasu_Produkcji);
 
-   begin
-      Put_Line("Buffer started");
-      Setup_Variables;
-      loop
-	 accept Take(Product: in Product_Type; Number: in Integer) do
-	   if Can_Accept(Product) then
-	      Put_Line("Accepted product " & Product_Name(Product) & " number " &
-		Integer'Image(Number));
-	      Storage(Product) := Storage(Product) + 1;
-	      In_Storage := In_Storage + 1;
-  	   else
-	      Put_Line("Rejected product " & Product_Name(Product) & " number " &
-		    Integer'Image(Number));
-	   end if;
-	 end Take;
-	 Storage_Contents;
-	 accept Deliver(Assembly: in Assembly_Type; Number: out Integer) do
-	    if Can_Deliver(Assembly) then
-	       Put_Line("Delivered assembly " & Assembly_Name(Assembly) & " number " &
-			  Integer'Image(Assembly_Number(Assembly)));
-	       for W in Product_Type loop
-		  Storage(W) := Storage(W) - Assembly_Content(Assembly, W);
-		  In_Storage := In_Storage - Assembly_Content(Assembly, W);
-	       end loop;
-	       Number := Assembly_Number(Assembly);
-	       Assembly_Number(Assembly) := Assembly_Number(Assembly) + 1;
-	    else
-	       Put_Line("Lacking products for assembly " & Assembly_Name(Assembly));
-	       Number := 0;
-	    end if;
-	 end Deliver;
-	 Storage_Contents;
-      end loop;
-   end Buffer;
-   
+	GP: Losuj_Czas_Produkcji.Generator;	--  Generator czasu Produkcji
+
+	Numer_Typu_Produktu: Integer;
+	Numer_Produktu: Integer;
+
 begin
-   for I in 1 .. Number_Of_Products loop
-      P(I).Start(I, 10);
-   end loop;
-   for J in 1 .. Number_Of_Consumers loop
-      K(J).Start(J,12);
-   end loop;
-end Simulation;
+	accept Start(Produkt: in Typ_Produkt) do
+		Losuj_Czas_Produkcji.Reset(GP);	--  Uruchom generator
+		Numer_Produktu := 1;
+		Numer_Typu_Produktu := Produkt;
+	end Start;
 
+	loop
+		Put_Line("Zaczeto produkcje " & Nazwa_Produktu(Numer_Typu_Produktu));
+		delay Duration(Losuj_Czas_Produkcji.Random(GP)); --  Symuluj produkcję
+		Put_Line("Wyprodukowano " & Nazwa_Produktu(Numer_Typu_Produktu)
+			& " numer "  & Integer'Image(Numer_Produktu));
+		-- Dostarcz do magazynu produkt
+		M.Odbierz(Numer_Typu_Produktu, Numer_Produktu);
+		Numer_Produktu := Numer_Produktu + 1;
+	end loop;
+
+end Producent;
+
+task body Klient is
+
+	subtype Przedzial_Czasu_Zamawiania is Integer range 1 .. 3;
+
+	package Losuj_Czas_Zamawiania is new
+		Ada.Numerics.Discrete_Random(Przedzial_Czasu_Zamawiania);
+
+	GCZ: Losuj_Czas_Zamawiania.Generator;	--  Generator Czasu Zamawiania
+	GZ: Losowy_Zestaw.Generator;	--  Generator nr Zestawu
+
+	ID_Klienta: Typ_Klient;
+	Numer_Zestawu: Integer;
+	Typ_Zestawu: Integer;
+
+begin
+	accept Start(Numer_Klienta: in Typ_Klient) do
+		Losuj_Czas_Zamawiania.Reset(GCZ);	--  Ustaw generatory
+		Losowy_Zestaw.Reset(GZ);
+		ID_Klienta := Numer_Klienta;
+	end Start;
+
+	loop
+		Put_Line("Do sklepu zawital klient: " & Imie_Klienta(ID_Klienta));
+		Typ_Zestawu := Losowy_Zestaw.Random(GZ);
+		delay Duration(Losuj_Czas_Zamawiania.Random(GCZ)); --  Symuluj zamawianie
+		Put_Line(Imie_Klienta(ID_Klienta) & ": zamawiam " &
+		Nazwa_Zestawow(Typ_Zestawu));
+		M.Skladaj(Typ_Zestawu, Numer_Zestawu);
+		if Numer_Zestawu = 0 then
+			Put_Line(Imie_Klienta(ID_Klienta) & 
+					": Trudno przyjde nastepnym razem!");
+		else
+			Put_Line(Imie_Klienta(ID_Klienta) & ": odebrano " &
+					Nazwa_Zestawow(Typ_Zestawu) & " numer " &
+					Integer'Image(Numer_Zestawu));
+		end if;
+	end loop;
+
+end Klient;
+
+task body Magazyn is
+
+	Pojemnosc_Magazynu: constant Integer := 20;
+
+	type Typ_Magazyn is array (Typ_Produkt) of Integer;
+
+	Magazyn: Typ_Magazyn := (0, 0, 0, 0, 0);
+
+	Zawartosc_Zestawow: array(Typ_Zestaw, Typ_Produkt) of Integer
+		:= ((1, 0, 0, 1, 2),(2, 3, 2, 2, 2),(0, 0, 0, 2, 2));
+
+	Max_Zawartosc_Zestawow: array(Typ_Produkt) of Integer;
+
+	Ilosc_Zestawu: array(Typ_Zestaw) of Integer := (0, 0, 0);
+
+	W_Magazynie: Integer := 0;
+
+	procedure Wyznacz_Max_Zestawow is
+
+	begin
+		for W in Typ_Produkt loop
+		Max_Zawartosc_Zestawow(W) := 0;
+			for Z in Typ_Zestaw loop
+				if Zawartosc_Zestawow(Z, W) > Max_Zawartosc_Zestawow(W) then
+				Max_Zawartosc_Zestawow(W) := Zawartosc_Zestawow(Z, W);
+				end if;
+			end loop;
+		end loop;
+
+	end Wyznacz_Max_Zestawow;
+
+	function Moze_Przyjac(Produkt: Typ_Produkt) return Boolean is
+
+	begin
+		if W_Magazynie >= Pojemnosc_Magazynu then -- Sprawdz pojemnosc magazynu
+			Put_Line("Magazyn pelny");
+			return False;
+		end if;
+
+		-- Sprawdz czy ilosc tego produktu nie jest za duza
+		if Magazyn(Produkt) >= Max_Zawartosc_Zestawow(Produkt) then
+			Put_Line("W magazynie jest wystarczajaca ilosc " & Nazwa_Produktu(Produkt));
+			return False;
+		end if;
+
+		return True; -- Jest miejsce na ten produkt
+
+	end Moze_Przyjac;
+
+	function Czy_Zlozy(Zestaw: Typ_Zestaw) return Boolean is
+
+	begin
+		for W in Typ_Produkt loop
+			if Magazyn(W) < Zawartosc_Zestawow(Zestaw, W) then
+				return False;
+			end if;
+		end loop;
+
+		return True;
+
+	end Czy_Zlozy;
+
+	procedure Magazyn_Info is
+
+	begin
+		Put_Line("Magazyn (" & Integer'Image(W_Magazynie) & ") zawiera: ");
+		for W in Typ_Produkt loop
+			Put_Line(Integer'Image(Magazyn(W)) & "x " & Nazwa_Produktu(W));
+		end loop;
+		Put_Line("Zlozono: ");
+		for Z in Typ_Zestaw loop
+			Put_Line(Integer'Image(Ilosc_Zestawu(Z)) & "x " & Nazwa_Zestawow(Z));
+		end loop;
+	end Magazyn_Info;
+begin
+	Put_Line("Magazyn otwiera sie:");
+	Wyznacz_Max_Zestawow;
+	loop
+		select
+			accept Odbierz(Produkt: in Typ_Produkt; Numer: in Integer) do
+				if Moze_Przyjac(Produkt) then
+					Put_Line("Przyjeto produkt: " & Nazwa_Produktu(Produkt) & " numer " &
+							Integer'Image(Numer));
+					
+					Magazyn(Produkt) := Magazyn(Produkt) + 1;
+					W_Magazynie := W_Magazynie + 1;
+				else
+					Put_Line("Odeslano produkt: " & Nazwa_Produktu(Produkt) & " numer " &
+							Integer'Image(Numer));
+					
+				end if;
+			end Odbierz;
+			Magazyn_Info;
+		else	
+			accept Skladaj(Zestaw: in Typ_Zestaw; Numer: out Integer) do
+				if Czy_Zlozy(Zestaw) then
+					Numer := Ilosc_Zestawu(Zestaw);
+					Ilosc_Zestawu(Zestaw) := Ilosc_Zestawu(Zestaw) + 1;
+					Put_Line("Zlozono zestaw " & Nazwa_Zestawow(Zestaw) & " numer " &
+							Integer'Image(Ilosc_Zestawu(Zestaw)));
+					
+					for W in Typ_Produkt loop
+						Magazyn(W) := Magazyn(W) - Zawartosc_Zestawow(Zestaw, W);
+						W_Magazynie := W_Magazynie - Zawartosc_Zestawow(Zestaw, W);
+					end loop;
+				else
+					Put_Line("Przykro nam, brakuje czesci do zamowienia " & Nazwa_Zestawow(Zestaw));
+					
+					Numer := 0;
+				end if;
+			end Skladaj;
+			Magazyn_Info;
+		end select;
+	end loop;
+
+end Magazyn;
+
+begin
+	for I in 1 .. Ilosc_Produktow loop
+		P(I).Start(I);
+	end loop;
+	for J in 1 .. Ilosc_Klientow loop
+		K(J).Start(J);
+	end loop;
+end Simulation;
