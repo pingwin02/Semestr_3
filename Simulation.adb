@@ -42,7 +42,7 @@ procedure Simulation is
 	-- W magazynie produkty sa skladane w zestaw
 	task type Magazyn is
 		-- Odbierz produkt jesli jest miejsce
-		entry Odbierz(Produkt: in Typ_Produkt; Numer: in Integer);
+		entry Odbierz(Produkt: in Typ_Produkt; Numer: in Integer; Wydajnosc_Produkcji: in Integer);
 		-- Zloz zestaw jesli jest wystarczajaco produktow
 		entry Skladaj(Zestaw: in Typ_Zestaw; Numer: out Integer);
 	end Magazyn;
@@ -55,29 +55,38 @@ procedure Simulation is
 
 		subtype Przedzial_Czasu_Produkcji is Integer range 2 .. 5;
 
+		subtype Przedzial_Wydajnosc_Produkcji is Integer range 1 .. 3;
+
 		package Losuj_Czas_Produkcji is new
 			Ada.Numerics.Discrete_Random(Przedzial_Czasu_Produkcji);
 
-		GP: Losuj_Czas_Produkcji.Generator;	--  Generator czasu Produkcji
+		package Losuj_Wydajnosc_Produkcji is new
+		Ada.Numerics.Discrete_Random(Przedzial_Wydajnosc_Produkcji);
+
+		GP: Losuj_Czas_Produkcji.Generator;	--  Generator czasu produkcji
+		GWP: Losuj_Wydajnosc_Produkcji.Generator; --  Generator wydajnosci produkcji
 
 		Numer_Typu_Produktu: Integer;
 		Numer_Produktu: Integer;
+		Wydajnosc_Produkcji: Integer;
 
 	begin
 		accept Start(Produkt: in Typ_Produkt) do
-			Losuj_Czas_Produkcji.Reset(GP);	--  Uruchom generator
+			Losuj_Czas_Produkcji.Reset(GP);	--  Uruchom generatory
+			Losuj_Wydajnosc_Produkcji.Reset(GWP);
 			Numer_Produktu := 1;
 			Numer_Typu_Produktu := Produkt;
 		end Start;
 
 		loop
-			Put_Line("Zaczeto produkcje " & Nazwa_Produktu(Numer_Typu_Produktu));
+			Wydajnosc_Produkcji := Losuj_Wydajnosc_Produkcji.Random(GWP);
+			Put_Line("Zaczeto produkcje: " & Nazwa_Produktu(Numer_Typu_Produktu));
 			delay Duration(Losuj_Czas_Produkcji.Random(GP)); --  Symuluj produkcję
-			Put_Line("Wyprodukowano " & Nazwa_Produktu(Numer_Typu_Produktu)
+			Put_Line("Wyprodukowano: " & Nazwa_Produktu(Numer_Typu_Produktu)
 				& " numer "  & Integer'Image(Numer_Produktu));
 			-- Dostarcz do magazynu produkt
-			M.Odbierz(Numer_Typu_Produktu, Numer_Produktu);
-			Numer_Produktu := Numer_Produktu + 1;
+			M.Odbierz(Numer_Typu_Produktu, Numer_Produktu, Wydajnosc_Produkcji);
+			Numer_Produktu := Numer_Produktu + Wydajnosc_Produkcji;
 		end loop;
 
 	end Producent;
@@ -131,7 +140,7 @@ procedure Simulation is
 		Magazyn: Typ_Magazyn := (0, 0, 0, 0, 0);
 
 		Zawartosc_Zestawow: array(Typ_Zestaw, Typ_Produkt) of Integer
-			:= ((2, 2, 0, 1, 0),(2, 1, 2, 2, 0),(1, 1, 1, 2, 1));
+			:= ((2, 2, 0, 0, 0),(3, 1, 2, 2, 0),(1, 1, 1, 2, 1));
 
 		Max_Zawartosc_Zestawow: array(Typ_Produkt) of Integer;
 
@@ -157,13 +166,13 @@ procedure Simulation is
 
 		begin
 			if W_Magazynie >= Pojemnosc_Magazynu then -- Sprawdz pojemnosc magazynu
-				Put_Line("Magazyn pelny");
+				Put_Line("Magazyn pelny!");
 				return False;
 			end if;
 
 			-- Sprawdz czy ilosc tego produktu nie jest za duza
 			if Magazyn(Produkt) >= Max_Zawartosc_Zestawow(Produkt) then
-				Put_Line("W magazynie jest wystarczajaca ilosc " & Nazwa_Produktu(Produkt));
+				Put_Line("W magazynie jest wystarczajaca ilosc: " & Nazwa_Produktu(Produkt));
 				return False;
 			end if;
 
@@ -202,12 +211,12 @@ procedure Simulation is
 		Wyznacz_Max_Zestawow;
 		loop
 			select
-				accept Odbierz(Produkt: in Typ_Produkt; Numer: in Integer) do
+				accept Odbierz(Produkt: in Typ_Produkt; Numer: in Integer; Wydajnosc_Produkcji: in Integer) do
 					if Moze_Przyjac(Produkt) then
 						Put_Line("Przyjeto produkt: " & Nazwa_Produktu(Produkt) & " numer " &
 								Integer'Image(Numer));
-						Magazyn(Produkt) := Magazyn(Produkt) + 1;
-						W_Magazynie := W_Magazynie + 1;
+						Magazyn(Produkt) := Magazyn(Produkt) + Wydajnosc_Produkcji;
+						W_Magazynie := W_Magazynie + Wydajnosc_Produkcji;
 					else
 						Put_Line("Odeslano produkt: " & Nazwa_Produktu(Produkt) & " numer " &
 								Integer'Image(Numer));
@@ -226,7 +235,7 @@ procedure Simulation is
 							W_Magazynie := W_Magazynie - Zawartosc_Zestawow(Zestaw, W);
 						end loop;
 					else
-						Put_Line("Przykro nam, brakuje czesci do zamowienia " & Nazwa_Zestawow(Zestaw));
+						Put_Line("Przykro nam, brakuje czesci do zamowienia: " & Nazwa_Zestawow(Zestaw));
 						Numer := 0;
 					end if;
 				end Skladaj;
@@ -243,4 +252,5 @@ begin
 	for J in 1 .. Ilosc_Klientow loop
 		K(J).Start(J);
 	end loop;
+	
 end Simulation;
