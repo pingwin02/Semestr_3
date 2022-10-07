@@ -1,0 +1,17 @@
+// A launch configuration that launches the extension inside a new window
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "(gdb) Build & debug",
+			"preLaunchTask": "build",
+			"type": "gdb",
+			"request": "launch",
+			"cwd": "${workspaceFolder}",
+			"valuesFormatting": "parseText",
+			"target": "${workspaceRoot}/obj/projekt.exe",
+			"terminal": " ",
+			"internalConsoleOptions": "openOnSessionStart"
+		},
+	]
+}
