@@ -206,11 +206,19 @@ procedure Simulation is
 					if Moze_Przyjac(Produkt) then
 						Put_Line("Przyjeto produkt: " & Nazwa_Produktu(Produkt) & " numer " &
 								Integer'Image(Numer));
+<<<<<<< HEAD
+=======
+						
+>>>>>>> 08d77e34b9bb742c132576e3d0acf68749ec6d12
 						Magazyn(Produkt) := Magazyn(Produkt) + 1;
 						W_Magazynie := W_Magazynie + 1;
 					else
 						Put_Line("Odeslano produkt: " & Nazwa_Produktu(Produkt) & " numer " &
 								Integer'Image(Numer));
+<<<<<<< HEAD
+=======
+						
+>>>>>>> 08d77e34b9bb742c132576e3d0acf68749ec6d12
 					end if;
 				end Odbierz;
 				Magazyn_Info;
@@ -221,12 +229,20 @@ procedure Simulation is
 						Ilosc_Zestawu(Zestaw) := Ilosc_Zestawu(Zestaw) + 1;
 						Put_Line("Zlozono zestaw " & Nazwa_Zestawow(Zestaw) & " numer " &
 								Integer'Image(Ilosc_Zestawu(Zestaw)));
+<<<<<<< HEAD
+=======
+						
+>>>>>>> 08d77e34b9bb742c132576e3d0acf68749ec6d12
 						for W in Typ_Produkt loop
 							Magazyn(W) := Magazyn(W) - Zawartosc_Zestawow(Zestaw, W);
 							W_Magazynie := W_Magazynie - Zawartosc_Zestawow(Zestaw, W);
 						end loop;
 					else
 						Put_Line("Przykro nam, brakuje czesci do zamowienia " & Nazwa_Zestawow(Zestaw));
+<<<<<<< HEAD
+=======
+						
+>>>>>>> 08d77e34b9bb742c132576e3d0acf68749ec6d12
 						Numer := 0;
 					end if;
 				end Skladaj;
