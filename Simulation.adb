@@ -20,7 +20,7 @@ procedure Simulation is
 		:= ("Lancuch ", "Zebatka ", "Rama    ", 
 		"Kola    ", "Siodelko");
 	Nazwa_Zestawow: constant array (Typ_Zestaw) of String(1 .. 11)
-		:= ("Mechaniczny", "BMX        ", "Kolarzowka ");
+		:= ("Mechaniczny", "Rower BMX  ", "Kolarzowka ");
 	Imie_Klienta: constant array (1 .. Ilosc_Klientow) of String(1 .. 6)
 		:= ("Damian", "Maciek", "Stefan");
 
@@ -53,7 +53,7 @@ procedure Simulation is
 
 	task body Producent is
 
-		subtype Przedzial_Czasu_Produkcji is Integer range 2 .. 5;
+		subtype Przedzial_Czasu_Produkcji is Integer range 5 .. 10;
 
 		subtype Przedzial_Wydajnosc_Produkcji is Integer range 1 .. 3;
 
@@ -74,26 +74,43 @@ procedure Simulation is
 		accept Start(Produkt: in Typ_Produkt) do
 			Losuj_Czas_Produkcji.Reset(GP);	--  Uruchom generatory
 			Losuj_Wydajnosc_Produkcji.Reset(GWP);
-			Numer_Produktu := 1;
+			Numer_Produktu := 0;
 			Numer_Typu_Produktu := Produkt;
 		end Start;
 
 		loop
+			delay 1.0;
 			Wydajnosc_Produkcji := Losuj_Wydajnosc_Produkcji.Random(GWP);
-			Put_Line("Zaczeto produkcje: " & Nazwa_Produktu(Numer_Typu_Produktu));
+			Put_Line("[PRODUCENT] Zaczeto produkcje: " & Nazwa_Produktu(Numer_Typu_Produktu));
 			delay Duration(Losuj_Czas_Produkcji.Random(GP)); --  Symuluj produkcję
-			Put_Line("Wyprodukowano: " & Nazwa_Produktu(Numer_Typu_Produktu)
-				& " numer "  & Integer'Image(Numer_Produktu));
+			if Wydajnosc_Produkcji = 2 then
+				Put_Line("[PRODUCENT] Wydajnosc produkcji 200%");
+			elsif Wydajnosc_Produkcji = 3 then
+				Put_Line("[PRODUCENT] Wydajnosc produkcji 300%");
+			end if;
+			Put_Line("[PRODUCENT] Wyprodukowano: " & Integer'Image(Wydajnosc_Produkcji) & "x " &
+			Nazwa_Produktu(Numer_Typu_Produktu) & "  nr "  & Integer'Image(Numer_Produktu));
+			delay 10.0;
 			-- Dostarcz do magazynu produkt
-			M.Odbierz(Numer_Typu_Produktu, Numer_Produktu, Wydajnosc_Produkcji);
-			Numer_Produktu := Numer_Produktu + Wydajnosc_Produkcji;
+			loop
+				select
+					M.Odbierz(Numer_Typu_Produktu, Numer_Produktu, Wydajnosc_Produkcji);
+					Numer_Produktu := Numer_Produktu + Wydajnosc_Produkcji;
+					exit;
+				else
+					Put_Line("[PRODUCENT] Towar (" & 
+					Nazwa_Produktu(Numer_Typu_Produktu) &
+					") czeka 5 sekund pod brama magazynu ...");
+					delay 5.0;
+				end select;
+			end loop;
 		end loop;
 
 	end Producent;
 
 	task body Klient is
 
-		subtype Przedzial_Czasu_Zamawiania is Integer range 1 .. 3;
+		subtype Przedzial_Czasu_Zamawiania is Integer range 3 .. 6;
 
 		package Losuj_Czas_Zamawiania is new
 			Ada.Numerics.Discrete_Random(Przedzial_Czasu_Zamawiania);
@@ -113,20 +130,31 @@ procedure Simulation is
 		end Start;
 
 		loop
-			Put_Line("Do sklepu zawital klient: " & Imie_Klienta(ID_Klienta));
+			delay 1.0;
+			Put_Line("[KLIENT] Do sklepu zawital klient: " & Imie_Klienta(ID_Klienta));
 			Typ_Zestawu := Losowy_Zestaw.Random(GZ);
+			Put_Line("[KLIENT] " & Imie_Klienta(ID_Klienta) & " zastanawia sie...");
 			delay Duration(Losuj_Czas_Zamawiania.Random(GCZ)); --  Symuluj zamawianie
-			Put_Line(Imie_Klienta(ID_Klienta) & ": zamawiam " &
+			Put_Line("[KLIENT] " & Imie_Klienta(ID_Klienta) & " zamawia zestaw " &
 			Nazwa_Zestawow(Typ_Zestawu));
-			M.Skladaj(Typ_Zestawu, Numer_Zestawu);
-			if Numer_Zestawu = 0 then
-				Put_Line(Imie_Klienta(ID_Klienta) & 
-						": Trudno przyjde nastepnym razem!");
-			else
-				Put_Line(Imie_Klienta(ID_Klienta) & ": odebrano " &
-						Nazwa_Zestawow(Typ_Zestawu) & " numer " &
-						Integer'Image(Numer_Zestawu));
-			end if;
+			loop
+				select
+					M.Skladaj(Typ_Zestawu, Numer_Zestawu);
+					if Numer_Zestawu /= 0 then
+						Put_Line("[KLIENT] " & Imie_Klienta(ID_Klienta) & " odbiera zestaw " &
+								Nazwa_Zestawow(Typ_Zestawu) & " nr " &
+								Integer'Image(Numer_Zestawu));
+					else
+						Put_Line("[KLIENT] " & Imie_Klienta(ID_Klienta) & 
+								": Trudno przyjde nastepnym razem!");
+					end if;
+					exit;
+				else
+					Put_Line("[KLIENT] " & Imie_Klienta(ID_Klienta) & 
+							" czeka na obsluzenie 5 sekund ...");
+					delay 5.0;		
+				end select;
+			end loop;
 		end loop;
 
 	end Klient;
@@ -166,13 +194,16 @@ procedure Simulation is
 
 		begin
 			if W_Magazynie >= Pojemnosc_Magazynu then -- Sprawdz pojemnosc magazynu
-				Put_Line("Magazyn pelny!");
+				Put_Line("[STAN] Magazyn pelny! Odbior niemozliwy!");
+				delay 3.0;
 				return False;
 			end if;
 
 			-- Sprawdz czy ilosc tego produktu nie jest za duza
 			if Magazyn(Produkt) >= Max_Zawartosc_Zestawow(Produkt) then
-				Put_Line("W magazynie jest wystarczajaca ilosc: " & Nazwa_Produktu(Produkt));
+				Put_Line("[STAN] W magazynie jest wystarczajaca ilosc: " 
+				& Nazwa_Produktu(Produkt) & ". Towar odeslano!");
+				delay 3.0;
 				return False;
 			end if;
 
@@ -196,7 +227,9 @@ procedure Simulation is
 		procedure Magazyn_Info is
 
 		begin
-			Put_Line("Magazyn (" & Integer'Image(W_Magazynie) & ") zawiera: ");
+			Put_Line("");
+			Put_Line("Magazyn (" & Integer'Image(W_Magazynie) & "/" 
+			& Integer'Image(Pojemnosc_Magazynu) &") zawiera: ");
 			for W in Typ_Produkt loop
 				Put_Line(Integer'Image(Magazyn(W)) & "x " & Nazwa_Produktu(W));
 			end loop;
@@ -204,42 +237,45 @@ procedure Simulation is
 			for Z in Typ_Zestaw loop
 				Put_Line(Integer'Image(Ilosc_Zestawu(Z)) & "x " & Nazwa_Zestawow(Z));
 			end loop;
+			Put_Line("");
 		end Magazyn_Info;
 		
 	begin
 		Put_Line("Magazyn otwiera sie:");
 		Wyznacz_Max_Zestawow;
+		delay 5.0;
 		loop
 			select
 				accept Odbierz(Produkt: in Typ_Produkt; Numer: in Integer; Wydajnosc_Produkcji: in Integer) do
 					if Moze_Przyjac(Produkt) then
-						Put_Line("Przyjeto produkt: " & Nazwa_Produktu(Produkt) & " numer " &
-								Integer'Image(Numer));
+						Put_Line("[MAGAZYN] Przyjeto dostawe " & Nazwa_Produktu(Produkt) & " nr " & Integer'Image(Numer));
 						Magazyn(Produkt) := Magazyn(Produkt) + Wydajnosc_Produkcji;
 						W_Magazynie := W_Magazynie + Wydajnosc_Produkcji;
-					else
-						Put_Line("Odeslano produkt: " & Nazwa_Produktu(Produkt) & " numer " &
-								Integer'Image(Numer));
+						Magazyn_Info;
 					end if;
 				end Odbierz;
-				Magazyn_Info;
-			else	
+			or
 				accept Skladaj(Zestaw: in Typ_Zestaw; Numer: out Integer) do
 					if Czy_Zlozy(Zestaw) then
+						Put_Line("[MAGAZYN] Skladamy zamowiony zestaw " 
+						& Nazwa_Zestawow(Zestaw) & " nr "
+						& Integer'Image(Ilosc_Zestawu(Zestaw)) 
+						& " Potrwa to 5 s...");
+						delay 5.0;
 						Numer := Ilosc_Zestawu(Zestaw);
 						Ilosc_Zestawu(Zestaw) := Ilosc_Zestawu(Zestaw) + 1;
-						Put_Line("Zlozono zestaw " & Nazwa_Zestawow(Zestaw) & " numer " &
+						Put_Line("[MAGAZYN] Zlozono zestaw " & Nazwa_Zestawow(Zestaw) & " nr " &
 								Integer'Image(Ilosc_Zestawu(Zestaw)));
 						for W in Typ_Produkt loop
 							Magazyn(W) := Magazyn(W) - Zawartosc_Zestawow(Zestaw, W);
 							W_Magazynie := W_Magazynie - Zawartosc_Zestawow(Zestaw, W);
 						end loop;
+						Magazyn_Info;
 					else
-						Put_Line("Przykro nam, brakuje czesci do zamowienia: " & Nazwa_Zestawow(Zestaw));
+						Put_Line("[MAGAZYN] Przykro nam, brakuje czesci do zamowienia: " & Nazwa_Zestawow(Zestaw));
 						Numer := 0;
 					end if;
 				end Skladaj;
-				Magazyn_Info;
 			end select;
 		end loop;
 
