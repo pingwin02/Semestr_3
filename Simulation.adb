@@ -17,8 +17,7 @@ procedure Simulation is
 	subtype Typ_Klient is Integer range 1 .. Ilosc_Klientow;
 
 	Nazwa_Produktu: constant array (Typ_Produkt) of String(1 .. 8)
-		:= ("Lancuch ", "Zebatka ", "Rama    ", 
-		"Kola    ", "Siodelko");
+		:= ("Lancuch ", "Zebatka ", "Rama    ", "Kola    ", "Siodelko");
 	Nazwa_Zestawow: constant array (Typ_Zestaw) of String(1 .. 11)
 		:= ("Mechaniczny", "Rower BMX  ", "Kolarzowka ");
 	Imie_Klienta: constant array (1 .. Ilosc_Klientow) of String(1 .. 6)
@@ -168,7 +167,7 @@ procedure Simulation is
 		Magazyn: Typ_Magazyn := (0, 0, 0, 0, 0);
 
 		Zawartosc_Zestawow: array(Typ_Zestaw, Typ_Produkt) of Integer
-			:= ((2, 2, 0, 0, 0),(3, 1, 2, 2, 0),(1, 1, 1, 2, 1));
+			:= ((3, 2, 0, 0, 0),(1, 2, 1, 2, 0),(1, 1, 1, 2, 1));
 
 		Max_Zawartosc_Zestawow: array(Typ_Produkt) of Integer;
 
