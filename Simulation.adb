@@ -63,7 +63,7 @@ procedure Simulation is
 
 	task body Producent is
 
-		subtype Przedzial_Czasu_Produkcji is Integer range 7 .. 12;
+		subtype Przedzial_Czasu_Produkcji is Integer range 3 .. 6;
 
 		package Losuj_Czas_Produkcji is new
 			Ada.Numerics.Discrete_Random(Przedzial_Czasu_Produkcji);
@@ -113,7 +113,7 @@ procedure Simulation is
 
 	task body Klient is
 
-		subtype Przedzial_Czasu_Zamawiania is Integer range 5 .. 10;
+		subtype Przedzial_Czasu_Zamawiania is Integer range 4 .. 8;
 
 		package Losuj_Czas_Zamawiania is new
 			Ada.Numerics.Discrete_Random(Przedzial_Czasu_Zamawiania);
@@ -148,8 +148,8 @@ procedure Simulation is
 								Integer'Image(Numer_Zestawu));
 					else
 						Put_Line("[KLIENT] " & Imie_Klienta(ID_Klienta) & 
-								": Trudno, przyjde za 10 sekund!");
-								delay 10.0;
+								": Trudno, przyjde za 5 sekund!");
+								delay 5.0;
 					end if;
 					exit;
 				else
@@ -202,8 +202,7 @@ procedure Simulation is
 			end if;
 
 			-- Sprawdz czy ilosc tego produktu nie jest za duza
-			if Magazyn(Produkt) > Max_Zawartosc_Zestawow(Produkt) 
-				and W_Magazynie > Pojemnosc_Magazynu/2 then
+			if Magazyn(Produkt) > 2 * Max_Zawartosc_Zestawow(Produkt) then
 					Put_Line("[STAN] W magazynie jest wystarczajaca ilosc: " 
 					& Nazwa_Produktu(Produkt) & ". Towar odeslano!");
 					return False;
@@ -246,6 +245,8 @@ procedure Simulation is
 	begin
 		Put_Line("Magazyn otwiera sie:");
 		Wyznacz_Max_Zestawow;
+		delay 1.0;
+		Magazyn_Info;
 		loop
 			select
 				-- Odbieranie produktow od producentow
@@ -266,9 +267,7 @@ procedure Simulation is
 						Numer := Ilosc_Zestawu(Zestaw);
 						Put_Line("[MAGAZYN] Skladamy zamowiony zestaw: " 
 						& Nazwa_Zestawow(Zestaw) & " nr "
-						& Integer'Image(Ilosc_Zestawu(Zestaw)) 
-						& " Potrwa to 5 s ...");
-						delay 5.0;
+						& Integer'Image(Ilosc_Zestawu(Zestaw)));
 						Put_Line("[MAGAZYN] Zlozono zestaw: " & Nazwa_Zestawow(Zestaw) 
 								& " nr " & Integer'Image(Ilosc_Zestawu(Zestaw)));
 						for W in Typ_Produkt loop
