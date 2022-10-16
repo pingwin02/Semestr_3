@@ -5,7 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Integer_Text_IO; 
 with Ada.Numerics.Discrete_Random;
 
-with Ada.Strings.Unbounded;			use Ada.Strings.Unbounded;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
 
 procedure Simulation is
@@ -62,7 +62,7 @@ procedure Simulation is
 
 	task body Producent is
 
-		subtype Przedzial_Czasu_Produkcji is Integer range 5 .. 10;
+		subtype Przedzial_Czasu_Produkcji is Integer range 3 .. 7;
 
 		package Losuj_Czas_Produkcji is new
 			Ada.Numerics.Discrete_Random(Przedzial_Czasu_Produkcji);
@@ -88,12 +88,12 @@ procedure Simulation is
 					" nr" & Integer'Image(Numer_Produktu));
 			Czas := Losuj_Czas_Produkcji.Random(GP);
 			delay Duration(Czas); -- Symuluj produkcje
-			Czas := Losuj_Czas_Produkcji.Random(GP);
 			Put_Line("[PRODUCENT] Wyprodukowano: " &
 					Nazwa_Produktu(Numer_Typu_Produktu) & 
 					" nr" & Integer'Image(Numer_Produktu) &
 					". Towar przyjedzie do magazynu za" &
 					Integer'Image(Czas) & " sekund ...");
+			Czas := Losuj_Czas_Produkcji.Random(GP);
 			delay Duration(Czas); -- Symuluj transport
 			loop
 				select
@@ -204,10 +204,7 @@ procedure Simulation is
 		function Moze_Przyjac(Produkt: Typ_Produkt) return Boolean is
 			Wolne_Miejsce: Integer := Pojemnosc_Magazynu - W_Magazynie;	-- Ilosc wolnego miejsca
 			
-			-- Tablica z iloscia brakujacych elementow do zlozenia kazdego zestawu
-			Brakujace_Produkty: array(Typ_Produkt) of Integer;
-			
-			-- Ile brakuje w sumie produktow do zlozenia kazdego zestawu
+			-- Ile miejsca potrzeba do zlozenia kazdego zestawu
 			Brakujace_Miejsce: Integer := 0;
 
 			begin
@@ -219,10 +216,10 @@ procedure Simulation is
 					return True;	-- Tego produktu brakuje
 				end if;
 
-				-- Obliczenie ilosci brakujacych produktow
+				-- Obliczenie brakujacego miejsca w magazynie
 				for W in Typ_Produkt loop
-					Brakujace_Produkty(W) := Integer'Max(0, Max_Zawartosc_Zestawow(W) - Magazyn(W));
-					Brakujace_Miejsce := Brakujace_Miejsce + Brakujace_Produkty(W);
+					Brakujace_Miejsce := Brakujace_Miejsce + 
+						Integer'Max(0, Max_Zawartosc_Zestawow(W) - Magazyn(W));
 				end loop;
 
 				if Wolne_Miejsce > Brakujace_Miejsce then
@@ -230,8 +227,12 @@ procedure Simulation is
 					-- poniewaz jest jeszcze mozliwosc dostarczenia 
 					-- brakujacych produktow do zlozenia kazdego zestawu
 					return True;
+				elsif Magazyn(Produkt) > Pojemnosc_Magazynu/2 then
+					-- Polowa magazynu jest zapelniona tym produktem,
+					-- skoro go juz nie brakuje to mozna go odrzucic
+					return False;
 				else
-					-- Brak miejsca dla tego produktu
+					-- Brak miejsca na ten produkt
 					return False;
 				end if;
 		end Moze_Przyjac;
