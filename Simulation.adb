@@ -227,7 +227,7 @@ procedure Simulation is
 					-- poniewaz jest jeszcze mozliwosc dostarczenia 
 					-- brakujacych produktow do zlozenia kazdego zestawu
 					return True;
-				elsif Magazyn(Produkt) > Pojemnosc_Magazynu/2 then
+				elsif Magazyn(Produkt) >= Pojemnosc_Magazynu/2 then
 					-- Polowa magazynu jest zapelniona tym produktem,
 					-- skoro go juz nie brakuje to mozna go odrzucic
 					return False;
