@@ -214,6 +214,10 @@ procedure Simulation is
 
 				if Max_Zawartosc_Zestawow(Produkt) > Magazyn(Produkt) then
 					return True;	-- Tego produktu brakuje
+				elsif Magazyn(Produkt) >= Pojemnosc_Magazynu/2 then
+					-- Polowa magazynu jest zapelniona tym produktem,
+					-- skoro go juz nie brakuje to mozna go odrzucic
+					return False;
 				end if;
 
 				-- Obliczenie brakujacego miejsca w magazynie
@@ -227,10 +231,6 @@ procedure Simulation is
 					-- poniewaz jest jeszcze mozliwosc dostarczenia 
 					-- brakujacych produktow do zlozenia kazdego zestawu
 					return True;
-				elsif Magazyn(Produkt) >= Pojemnosc_Magazynu/2 then
-					-- Polowa magazynu jest zapelniona tym produktem,
-					-- skoro go juz nie brakuje to mozna go odrzucic
-					return False;
 				else
 					-- Brak miejsca na ten produkt
 					return False;
