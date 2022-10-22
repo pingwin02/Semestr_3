@@ -179,7 +179,7 @@ procedure Simulation is
 		Magazyn: Typ_Magazyn := (0, 0, 0, 0, 0);
 
 		Zawartosc_Zestawow: array(Typ_Zestaw, Typ_Produkt) of Integer
-			:= ((3, 2, 0, 0, 0),(1, 2, 1, 2, 0),(1, 1, 1, 2, 1));
+			:= ((2, 2, 0, 0, 1),(1, 2, 1, 2, 0),(1, 1, 1, 2, 1));
 
 		Max_Zawartosc_Zestawow: array(Typ_Produkt) of Integer;
 
