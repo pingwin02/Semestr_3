@@ -163,7 +163,7 @@ procedure Simulation is
 				else
 					Put_Line("[KLIENT] " & Imie_Klienta(ID_Klienta) & 
 							" niecierpliwi sie.");
-					delay 5.0;
+					delay 1.0;
 				end select;
 			end loop;
 		end loop;
@@ -277,6 +277,7 @@ procedure Simulation is
 				-- Odbieranie produktow od producentow
 				accept Odbierz(Produkt: in Typ_Produkt; Numer: in Integer; Stan: out Boolean) do
 					if Moze_Przyjac(Produkt) then
+						delay 0.5;
 						Put_Line("[MAGAZYN] Przyjeto dostawe: " &
 								Nazwa_Produktu(Produkt) & " nr" & Integer'Image(Numer));
 						Magazyn(Produkt) := Magazyn(Produkt) + 1;
@@ -295,6 +296,7 @@ procedure Simulation is
 					if Czy_Zlozy(Zestaw) then
 						Ilosc_Zestawu(Zestaw) := Ilosc_Zestawu(Zestaw) + 1;
 						Numer := Ilosc_Zestawu(Zestaw);
+						delay 0.5;
 						Put_Line("[MAGAZYN] Zlozono zamowiony zestaw: " 
 								& Nazwa_Zestawow(Zestaw) & " nr"
 								& Integer'Image(Ilosc_Zestawu(Zestaw)));
