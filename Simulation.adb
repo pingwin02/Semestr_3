@@ -172,6 +172,8 @@ procedure Simulation is
 
 	task body Magazyn is
 
+		Za_Malo_Produktow_Wyjatek: Exception;
+
 		Pojemnosc_Magazynu: constant Integer := 30;
 
 		type Typ_Magazyn is array (Typ_Produkt) of Integer;
@@ -243,7 +245,7 @@ procedure Simulation is
 			-- Sprawdz czy mozna zlozyc zestaw
 			for W in Typ_Produkt loop
 				if Magazyn(W) < Zawartosc_Zestawow(Zestaw, W) then
-					return False;
+					raise Za_Malo_Produktow_Wyjatek; -- Zglos wyjatek gdy jest za malo produktow w magazynie
 				end if;
 			end loop;
 
@@ -305,11 +307,19 @@ procedure Simulation is
 							W_Magazynie := W_Magazynie - Zawartosc_Zestawow(Zestaw, W);
 						end loop;
 						Magazyn_Info;
-					else
-						Put_Line("[MAGAZYN] Przykro nam, brakuje czesci do zestawu: " &
-								Nazwa_Zestawow(Zestaw));
-						Numer := 0;
 					end if;
+					exception
+						when Za_Malo_Produktow_Wyjatek =>
+							Put_Line("[WYJATEK] W magazynie jest za malo produktow! Zlomowisko przyslalo nam czesci ze zlomu!");
+							for W in Typ_Produkt loop
+								if Moze_Przyjac(W) then
+									Put_Line("[MAGAZYN] Zlomowisko przyslalo: " & Nazwa_Produktu(W));
+									delay 0.15;
+									Magazyn(W) := Magazyn(W) + 1;
+									W_Magazynie := W_Magazynie + 1;
+								end if;
+							end loop;
+							Numer := 0;
 				end Skladaj;
 			end select;
 		end loop;
