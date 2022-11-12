@@ -1,3 +1,11 @@
 {
     "debug.openDebug": "neverOpen",
+    "saveAndRun": {
+        "commands": [
+          {
+            "match": ".st",
+            "cmd": "clear && gst ${fileBasename}"
+          }
+        ]
+      }
 }

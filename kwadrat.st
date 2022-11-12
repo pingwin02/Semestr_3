@@ -64,7 +64,7 @@ initialize: bok
 "TESTY"
 
 k:= (Kwadrat new) initialize: 2.
-t:= (TrojkatRownoramienny new) initialize: 4 wysokosc: 2.
+t:= (Kwadrat new) initialize: 5.
 
 Transcript show: 'Dane sa figury:'; cr. 
 k drukuj.
@@ -77,7 +77,3 @@ k1 drukuj.
 Transcript cr; show: 't + k: '.
 t1 := t + k.
 tl drukuj.
-
-Transcript cr; show: 'skaluj: 2 '.
-k2:= k skaluj: 2. 
-k2 drukuj.
