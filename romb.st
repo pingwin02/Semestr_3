@@ -2,7 +2,7 @@
 "Romb i wysrodkuj"
 
 Object subclass: #Wielokat
-	instanceVariableNames: 'wierzcholki nazwa liczbaW'
+	instanceVariableNames: 'wierzcholki nazwa'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'JezykiProgramowania'!
@@ -13,8 +13,7 @@ initialize: liczbaWierzcholkow name: nowaNazwa
 	"konstruktor obiektu - wielokata"
 
 	nazwa := nowaNazwa.
-	liczbaW := liczbaWierzcholkow.
-	wierzcholki := Array new: liczbaW.
+	wierzcholki := Array new: liczbaWierzcholkow.
 	wierzcholki at: 1 put: 0@0.! !
 
 !Wielokat methodsFor: 'accessing'!
@@ -32,52 +31,19 @@ nazwa: nowa_nazwa
 !Wielokat methodsFor: 'actions' !
 
 drukuj
-    Transcript show: 'Dana jest figura: '; show: nazwa; cr. 
-    1 to: liczbaW do:
+    Transcript cr; show: 'Dana jest figura: '; show: nazwa; cr. 
+    1 to: wierzcholki size do:
     [:i | 
 		Transcript show: 'Wierzcholek '; 
 		show: i printString; show: ':	';
-		show: (wierzcholki at: i) x printString;
+		show: ((wierzcholki at: i) x roundTo: 0.0001) printString;
 		show: ' @ ';
-		show: (wierzcholki at: i) y printString; cr.
+		show: ((wierzcholki at: i) y roundTo: 0.0001) printString; cr.
 	].
-	Transcript show: 'Pole = '; show: self pole printString; cr; cr. ! !
-
-Wielokat subclass: #Kwadrat
-	instanceVariableNames: 'bok'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'JezykiProgramowania'!
-
-!Kwadrat methodsFor: 'arithmetic'!
-
-+ figura
-	"dodaj 2 figury w sensie pola"
-
-	| p |
-
-	p:=(self pole + figura pole) * 1e.
-	^(Kwadrat new) initialize: p sqrt. ! !
-
-!Kwadrat methodsFor: 'actions'!
-
-pole
-	"licz pole kwadratu"
-
-	^bok squared! !
-
-!Kwadrat methodsFor: 'initialize-release'!
-
-initialize: nowybok
-	"tworz kwadrat o podanym boku"
-
-	super initialize: 4 name: 'Kwadrat'.
-	bok := nowybok.
-	wierzcholki at: 2 put: bok@0.
-	wierzcholki at: 3 put: bok@bok.
-	wierzcholki at: 4 put: 0@bok.! !
-
-
+	Transcript show: 'Pole = '; 
+	show: (self pole roundTo: 0.0001) printString; 
+	cr. ! !
+	
 Wielokat subclass: #Romb
 
 	instanceVariableNames: 'bok kat'
@@ -92,7 +58,7 @@ Wielokat subclass: #Romb
 
 	| p |
 
-	p:=(self pole + figura pole) * 1e.
+	p:=(self pole + figura pole).
 	^(Romb new) initialize: (p / (kat sin)) sqrt 
 			kat: kat * 180 / (Float pi) ! !
 
@@ -106,23 +72,29 @@ pole
 wysrodkuj
 
 	| xsr ysr |
+	
+	Transcript cr; show: 'Wysrodkuje figure: '; show: nazwa; cr.
 
 	"Wyznaczenie miejsca przeciecia sie przekatnych"
 	xsr := 0.
 	ysr := 0.
 
-	1 to: liczbaW do:
+	1 to: wierzcholki size do:
 	[:i |
 		xsr := xsr + ((wierzcholki at: i) x).
 		ysr := ysr + ((wierzcholki at: i) y).
 	].
 
-	xsr := xsr/liczbaW.
-	ysr := ysr/liczbaW.
-
+	xsr := xsr/(wierzcholki size).
+	ysr := ysr/(wierzcholki size).
+	
+	Transcript show: 'Srodek figury znajduje sie w punkcie: ';
+	show: (xsr roundTo: 0.0001) printString; 
+	show: ' @ '; show: (ysr roundTo: 0.0001) printString.
+	
 	"Wysrodkowanie"
 
-	1 to: liczbaW do:
+	1 to: wierzcholki size do:
 	[:i |
 		wierzcholki at: i put: 
 		((wierzcholki at: i) x - xsr) @ ((wierzcholki at: i) y - ysr).
@@ -143,43 +115,68 @@ initialize: nowybok kat: nowykat
 	wierzcholki at: 2 put: bok@0.
 	wierzcholki at: 3 put: (offset + bok)@wys.
 	wierzcholki at: 4 put: offset@wys. ! !
-	
-"TESTY"
 
-Transcript show: 'Dane sa figury:'; cr; cr.
+Romb subclass: #Kwadrat
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'JezykiProgramowania'!
 
-Transcript show: 't:'; cr.
-t := (Kwadrat new) initialize: 5.
+!Kwadrat methodsFor: 'arithmetic'!
+
++ figura
+	"dodaj 2 figury w sensie pola"
+
+	| p |
+
+	p:=(self pole + figura pole).
+	^(Kwadrat new) initialize: p sqrt. ! !
+
+!Kwadrat methodsFor: 'actions'!
+
+pole
+	"licz pole kwadratu"
+
+	^bok squared! !
+
+!Kwadrat methodsFor: 'initialize-release'!
+
+initialize: nowybok
+	"tworz kwadrat o podanym boku"
+	"kwadrat jest rombem o kacie 90 stopni"
+
+	super initialize: nowybok kat: 90.
+	self nazwa: 'Kwadrat'.
+	bok := nowybok.
+	wierzcholki at: 2 put: bok@0.
+	wierzcholki at: 3 put: bok@bok.
+	wierzcholki at: 4 put: 0@bok.! !
+
+k := (Kwadrat new) initialize: 5.
+t := (Romb new) initialize: 2 kat: 30.
+
+Transcript show: 'Dane sa wielokaty :'; cr.
+k drukuj.
 t drukuj.
 
-Transcript show: 'r:'; cr.
-r := (Romb new) initialize: 3 kat: 30.
-r drukuj.
+Transcript cr ; show: 't+k'.
+t1 := t + k.
+t1 drukuj.
 
-Transcript show: 'd:'; cr.
-d := (Romb new) initialize: 2 kat: 15.
-d drukuj.
+Transcript cr ; show: 'k+t'.
+k1 := k + t.
+k1 drukuj.
 
-Transcript show: 'd+d+d:'; cr.
-d2 := d+d+d.
-d2 drukuj.
+Transcript cr ; show: 'k+k'.
+k1 := k + k.
+k1 drukuj.
 
-Transcript show: 'd+r:'; cr.
-d1 := d+r.
-d1 drukuj.
+Transcript cr ; show: 't+t'.
+t1 := t + t.
+t1 drukuj.
 
-Transcript show: 'r+d:'; cr.
-r1 := r+d.
-r1 drukuj.
+k2 := k wysrodkuj.
+k2 drukuj.
 
-Transcript show: 'wysrodkuj r+d:'; cr.
-r1 wysrodkuj.
-r1 drukuj.
-
-Transcript show: 'd+r+t:'; cr.
-combo := d+r+t.
-combo drukuj.
-
-Transcript show: 'wysrodkuj d+r+t:'; cr.
-combo wysrodkuj.
-combo drukuj.
+t2 := t wysrodkuj.
+t2 drukuj.
