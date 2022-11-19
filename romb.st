@@ -94,7 +94,7 @@ Wielokat subclass: #Romb
 
 	p:=(self pole + figura pole) * 1e.
 	^(Romb new) initialize: (p / (kat sin)) sqrt 
-			kat: kat * 180 / 3.14159265359e ! !
+			kat: kat * 180 / (Float pi) ! !
 
 !Romb methodsFor: 'actions'!
 
@@ -137,7 +137,7 @@ initialize: nowybok kat: nowykat
 
 	super initialize: 4 name: 'Romb'.
 	bok := nowybok.
-	kat := nowykat * 3.14159265359e / 180.
+	kat := nowykat * (Float pi) / 180.
 	wys := bok*(kat sin).
 	offset := bok*(kat cos).
 	wierzcholki at: 2 put: bok@0.
