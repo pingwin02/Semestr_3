@@ -26,7 +26,12 @@ nazwa
 nazwa: nowa_nazwa
 	"ustawia nowa nazwe wielokata"
 
-	nazwa:=nowa_nazwa ! !
+	nazwa:=nowa_nazwa ! 
+
+wierzcholki
+	"zwraca tablice wierzcholkow"
+
+	^wierzcholki ! !
 	
 !Wielokat methodsFor: 'actions' !
 
@@ -71,11 +76,12 @@ pole
 	
 wysrodkuj
 
-	| xsr ysr |
+	| xsr ysr nowy |
 	
 	Transcript cr; show: 'Wysrodkuje figure: '; show: nazwa; cr.
 
 	"Wyznaczenie miejsca przeciecia sie przekatnych"
+
 	xsr := 0.
 	ysr := 0.
 
@@ -92,13 +98,18 @@ wysrodkuj
 	show: (xsr roundTo: 0.0001) printString; 
 	show: ' @ '; show: (ysr roundTo: 0.0001) printString.
 	
-	"Wysrodkowanie"
+	"Wysrodkowanie - zwracanie kopii wielokata 
+	o zmienionym polozeniu"
+
+	nowy := self deepCopy.
 
 	1 to: wierzcholki size do:
 	[:i |
-		wierzcholki at: i put: 
+		nowy wierzcholki at: i put: 
 		((wierzcholki at: i) x - xsr) @ ((wierzcholki at: i) y - ysr).
-	]. ! !
+	]. 
+	
+	^nowy ! !
 
 !Romb methodsFor: 'initialize-release'!
 
