@@ -1,0 +1,42 @@
+﻿html	{ min-height: 100%; height: auto;
+	}
+body	{ background: #d0d0d0;
+	}
+h1	{ font-size: 36pt; margin-top: 24px; text-align: center; 
+	}
+p	{ font-size: 28pt; margin: 10px; text-align: center; 
+	}
+video	{ width: 100%;	
+
+        }
+#movie {
+        filter: sepia();
+        }
+
+canvas	{
+        width: 100%;	
+        background: #ffffff;
+        }
+
+#div_video {
+        width:45%; height: auto; min-height: 300px;
+        float:left;
+        margin: 10px;
+        background: #558899;
+    	box-shadow: 0 0 5px 5px #558899;
+        }
+
+#div_canvas {
+        width:45%; height: auto; min-height: 300px;
+	float:right;
+        margin: 10px;
+        background: #cc8899;
+        box-shadow: 0 0 5px 5px #cc8899; 
+        }
+
+#div_webgl {
+        width:60%; height:40vw; min-height: 100px;
+        margin: 10px auto;
+        clear: both;
+        }
+

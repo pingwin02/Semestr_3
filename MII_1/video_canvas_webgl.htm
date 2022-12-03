@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Multimedia i interfejsy</title>
+
+    <link href="css/video.css" rel="stylesheet" type="text/css">
+
+    <meta charset="utf-8">
+
+	<script src="js/three.js"></script>  
+	<script src="js/my_scene.js"></script>
+
+
+<script type="text/javascript">
+
+	var canvas;
+	var ctx;
+	var w, h;
+
+	var direction = -1;
+	var mode = 1;
+	var degree = 0;
+	var speed = 0.01;
+
+	function animate() {
+
+		ctx.clearRect(0,0,w,h);
+
+		if (mode == -1) { //obracanie wlaczone
+			degree += direction * speed;
+		}
+		ctx.translate(w/2, h/2);
+		ctx.rotate(degree);
+		ctx.translate(-w/2, -h/2);
+
+		ctx.drawImage(movie, w/6, h/6, 2*w/3, 2*h/3);
+		ctx.strokeRect(w/6, h/6, 2*w/3, 2*h/3);
+
+		ctx.translate(w/2, h/2);
+		ctx.rotate(-degree);
+		ctx.translate(-w/2, -h/2);
+		
+		ctx.fillText('Damian Jankowski', w/4, 19*h/20);
+		requestAnimationFrame(animate); //funkcja animate() bedzie wywolywana 60 razy na sekunde
+	}
+
+
+	function load() {
+
+		canvas = document.getElementById("myCanvas");	
+		w = canvas.width
+		h = canvas.height;	
+		ctx = canvas.getContext('2d');
+		ctx.strokeStyle = "blue";
+		ctx.lineWidth = 5;
+		ctx.font = "bold 72px Times New Roman";
+		ctx.canvas.addEventListener('mouseover', function(event){
+			direction = 1;
+		});
+
+		ctx.canvas.addEventListener('mouseout', function(event){
+			direction = -1;
+		});
+
+		animate();
+	}
+
+	function rotate() {
+		mode *= -1;
+	}
+
+</script>
+
+
+</head>
+
+<body onload = "load();init();"> 
+
+	<h1>Jankowski Damian - HTML5</h1>
+
+	<div id="div_video">  
+		<p>video</p> 
+		<video id="movie" loop controls src="video.mp4" crossorigin="anonymous">
+		</video>
+	</div>
+
+	<div id="div_canvas" >	
+		<p>canvas</p>
+		<canvas id="myCanvas" ondblclick="rotate()" width="1280" height="720" ></canvas>
+	</div>
+
+	<div id="div_webgl">
+              
+	</div>
+
+</body> 
+</html>
+ 
