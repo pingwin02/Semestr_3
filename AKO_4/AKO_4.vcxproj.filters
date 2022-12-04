@@ -51,6 +51,9 @@
     <MASM Include="laby64.asm">
       <Filter>Source Files</Filter>
     </MASM>
+    <MASM Include="dodaj.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Zadanie4.1a.c">
@@ -84,6 +87,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="labyC.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dodajC.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
