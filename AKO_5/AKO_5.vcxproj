@@ -81,7 +81,6 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalOptions>libcmt.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -129,9 +128,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <MASM Include="source.asm">
+    <MASM Include="kwadratowa.asm">
       <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </MASM>
+    <MASM Include="Zadanie5.1b.asm" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Zadanie5.1a.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

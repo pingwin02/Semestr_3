@@ -15,8 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="source.asm">
+    <MASM Include="kwadratowa.asm">
       <Filter>Source Files</Filter>
     </MASM>
+    <MASM Include="Zadanie5.1b.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Zadanie5.1a.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
