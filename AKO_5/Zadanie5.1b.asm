@@ -19,12 +19,14 @@ _srednia_harm PROC
 	suma:
 	fld1
 	fld dword ptr [esi + 4*ecx - 4]
-	fdivp st(1), st(0)
-	faddp st(1), st(0)
+	fdiv	; fdivp st(1), st(0)
+	fadd	; faddp st(1), st(0)
 	loop suma
 
 	fild dword ptr [ebp + 12]
-	fdiv st (0), st(1)
+
+	fxch st(1)
+	fdiv
 
 	pop esi
 	pop ebp
