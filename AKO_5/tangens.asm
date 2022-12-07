@@ -21,6 +21,15 @@ wyswietl_EAX PROC
 	sub esp, 12
 	mov ebp, esp
 
+	mov [ebp], byte ptr 0		; kod null
+	mov [ebp] [11], byte ptr 0	; kod null
+
+	bt eax, 31
+	jnc dodatnia
+	neg eax
+	mov [ebp], byte ptr '-'
+
+	dodatnia:
 	mov esi, 10 ; indeks w tablicy 'znaki'
 	mov ebx, 10	; dzielnik równy 10
 
@@ -46,8 +55,6 @@ wypeln:
 	jmp wypeln 
 
 wyswietl: 
-	mov [ebp], byte ptr 0		; kod null
-	mov [ebp] [11], byte ptr 0	; kod null
 ; wyœwietlenie cyfr na ekranie 
 	push 12						; liczba wyœwietlanych znaków 
 	push ebp					; adres wyœw. obszaru 
@@ -100,7 +107,7 @@ ptl:
 	; st(0) = tan_ulamk
 	fild dokladnosc
 	fmul
-	; st(0) = tan_ulamk*100
+	; st(0) = tan_ulamk*1000
 	fist tangens
 	mov eax, tangens
 
