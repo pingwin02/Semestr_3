@@ -144,7 +144,9 @@
     <MASM Include="Zadanie5.3b.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </MASM>
-    <MASM Include="Zadanie5.4b.asm" />
+    <MASM Include="Zadanie5.4b.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </MASM>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arytmc_SSE.c">
@@ -159,7 +161,13 @@
     <ClCompile Include="Zadanie5.3a.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Zadanie5.4a.c" />
+    <ClCompile Include="Zadanie5.4a.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Zadanie5.5a.c" />
+    <MASM Include="Zadanie5.5b.asm">
+      <FileType>Document</FileType>
+    </MASM>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

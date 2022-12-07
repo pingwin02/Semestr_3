@@ -33,6 +33,9 @@
     <MASM Include="Zadanie5.4b.asm">
       <Filter>Source Files</Filter>
     </MASM>
+    <MASM Include="Zadanie5.5b.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Zadanie5.1a.c">
@@ -48,6 +51,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Zadanie5.4a.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Zadanie5.5a.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
