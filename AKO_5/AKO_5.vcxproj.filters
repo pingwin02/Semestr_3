@@ -36,6 +36,24 @@
     <MASM Include="Zadanie5.5b.asm">
       <Filter>Source Files</Filter>
     </MASM>
+    <MASM Include="Zadanie5.6b.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="objetosc.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="szybki_max.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="tangens.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="mul_at_once.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="dziel.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Zadanie5.1a.c">
@@ -54,6 +72,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Zadanie5.5a.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Zadanie5.6a.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="objetoscC.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="szybki_maxC.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mul_at_onceC.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dzielC.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
