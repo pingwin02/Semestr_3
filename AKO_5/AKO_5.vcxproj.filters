@@ -54,6 +54,9 @@
     <MASM Include="dziel.asm">
       <Filter>Source Files</Filter>
     </MASM>
+    <MASM Include="laby.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Zadanie5.1a.c">
@@ -87,6 +90,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dzielC.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="labyC.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
