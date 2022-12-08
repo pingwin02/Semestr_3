@@ -194,253 +194,292 @@ HRESULT CompileShaderFromFile( WCHAR* szFileName, LPCSTR szEntryPoint, LPCSTR sz
 HRESULT InitDevice()
 {
     SimpleVertex vertices[] = {
-    { XMFLOAT3(-0.44f, -0.85f, -0.06f), XMFLOAT3(-1.0f, -0.1f, 0.0f) },
-    { XMFLOAT3(-0.49f, -0.35f, -0.11f), XMFLOAT3(-1.0f, -0.1f, 0.0f) },
-    { XMFLOAT3(-0.49f, -0.35f, 0.31f), XMFLOAT3(-1.0f, -0.1f, 0.0f) },
+    { XMFLOAT3(-0.55f, -0.61f, -0.13f), XMFLOAT3(-0.5f, -0.0f, 0.0f) },
+    { XMFLOAT3(-0.55f, 0.64f, -0.13f), XMFLOAT3(-0.5f, -0.0f, 0.0f) },
+    { XMFLOAT3(-0.55f, 0.64f, 0.17f), XMFLOAT3(-0.5f, -0.0f, 0.0f) },
 
-    { XMFLOAT3(-0.44f, -0.85f, -0.06f), XMFLOAT3(-1.0f, -0.1f, -0.0f) },
-    { XMFLOAT3(-0.49f, -0.35f, 0.31f), XMFLOAT3(-1.0f, -0.1f, -0.0f) },
-    { XMFLOAT3(-0.44f, -0.85f, 0.26f), XMFLOAT3(-1.0f, -0.1f, -0.0f) },
+    { XMFLOAT3(-0.55f, -0.61f, -0.13f), XMFLOAT3(-0.5f, 0.0f, -0.0f) },
+    { XMFLOAT3(-0.55f, 0.64f, 0.17f), XMFLOAT3(-0.5f, 0.0f, -0.0f) },
+    { XMFLOAT3(-0.55f, -0.61f, 0.17f), XMFLOAT3(-0.5f, 0.0f, -0.0f) },
 
-    { XMFLOAT3(-0.44f, -0.85f, 0.26f), XMFLOAT3(0.0f, -0.1f, 1.0f) },
-    { XMFLOAT3(-0.49f, -0.35f, 0.31f), XMFLOAT3(0.0f, -0.1f, 1.0f) },
-    { XMFLOAT3(-0.07f, -0.35f, 0.31f), XMFLOAT3(0.0f, -0.1f, 1.0f) },
+    { XMFLOAT3(-0.55f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(-0.55f, 0.64f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(-0.35f, 0.64f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
 
-    { XMFLOAT3(-0.44f, -0.85f, 0.26f), XMFLOAT3(0.0f, -0.1f, 1.0f) },
-    { XMFLOAT3(-0.07f, -0.35f, 0.31f), XMFLOAT3(0.0f, -0.1f, 1.0f) },
-    { XMFLOAT3(-0.12f, -0.85f, 0.26f), XMFLOAT3(0.0f, -0.1f, 1.0f) },
+    { XMFLOAT3(-0.55f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(-0.35f, 0.64f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(-0.35f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
 
-    { XMFLOAT3(-0.07f, -0.35f, 0.31f), XMFLOAT3(0.0f, 1.0f, -0.0f) },
-    { XMFLOAT3(-0.07f, -0.35f, -0.11f), XMFLOAT3(0.0f, 1.0f, -0.0f) },
-    { XMFLOAT3(0.11f, -0.35f, -0.11f), XMFLOAT3(0.0f, 1.0f, -0.0f) },
+    { XMFLOAT3(-0.35f, -0.61f, 0.17f), XMFLOAT3(0.5f, 0.0f, 0.0f) },
+    { XMFLOAT3(-0.35f, 0.64f, 0.17f), XMFLOAT3(0.5f, 0.0f, 0.0f) },
+    { XMFLOAT3(-0.35f, 0.64f, -0.13f), XMFLOAT3(0.5f, 0.0f, 0.0f) },
 
-    { XMFLOAT3(-0.07f, -0.35f, 0.31f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-    { XMFLOAT3(0.11f, -0.35f, -0.11f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-    { XMFLOAT3(0.11f, -0.35f, 0.31f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+    { XMFLOAT3(-0.35f, -0.61f, 0.17f), XMFLOAT3(0.5f, 0.0f, -0.0f) },
+    { XMFLOAT3(-0.35f, 0.64f, -0.13f), XMFLOAT3(0.5f, 0.0f, -0.0f) },
+    { XMFLOAT3(-0.35f, -0.61f, -0.13f), XMFLOAT3(0.5f, 0.0f, -0.0f) },
 
-    { XMFLOAT3(-0.12f, -0.85f, -0.06f), XMFLOAT3(0.0f, -0.1f, -1.0f) },
-    { XMFLOAT3(-0.07f, -0.35f, -0.11f), XMFLOAT3(0.0f, -0.1f, -1.0f) },
-    { XMFLOAT3(-0.49f, -0.35f, -0.11f), XMFLOAT3(0.0f, -0.1f, -1.0f) },
+    { XMFLOAT3(-0.35f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.35f, 0.64f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.55f, 0.64f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
 
-    { XMFLOAT3(-0.12f, -0.85f, -0.06f), XMFLOAT3(0.0f, -0.1f, -1.0f) },
-    { XMFLOAT3(-0.49f, -0.35f, -0.11f), XMFLOAT3(0.0f, -0.1f, -1.0f) },
-    { XMFLOAT3(-0.44f, -0.85f, -0.06f), XMFLOAT3(0.0f, -0.1f, -1.0f) },
+    { XMFLOAT3(-0.35f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.55f, 0.64f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.55f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
 
-    { XMFLOAT3(-0.44f, -0.85f, 0.26f), XMFLOAT3(0.0f, -1.0f, 0.0f) },
-    { XMFLOAT3(-0.12f, -0.85f, 0.26f), XMFLOAT3(0.0f, -1.0f, 0.0f) },
-    { XMFLOAT3(-0.12f, -0.85f, -0.06f), XMFLOAT3(0.0f, -1.0f, 0.0f) },
+    { XMFLOAT3(-0.55f, -0.61f, -0.13f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
+    { XMFLOAT3(-0.55f, -0.61f, 0.17f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
+    { XMFLOAT3(-0.55f, -0.81f, 0.17f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
 
-    { XMFLOAT3(-0.44f, -0.85f, 0.26f), XMFLOAT3(0.0f, -1.0f, 0.0f) },
-    { XMFLOAT3(-0.12f, -0.85f, -0.06f), XMFLOAT3(0.0f, -1.0f, 0.0f) },
-    { XMFLOAT3(-0.44f, -0.85f, -0.06f), XMFLOAT3(0.0f, -1.0f, 0.0f) },
+    { XMFLOAT3(-0.55f, -0.61f, -0.13f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
+    { XMFLOAT3(-0.55f, -0.81f, 0.17f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
+    { XMFLOAT3(-0.55f, -0.81f, -0.13f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
 
-    { XMFLOAT3(-0.49f, -0.35f, 0.31f), XMFLOAT3(-0.99f, -0.13f, 0.0f) },
-    { XMFLOAT3(-0.49f, -0.35f, -0.11f), XMFLOAT3(-0.99f, -0.13f, 0.0f) },
-    { XMFLOAT3(-0.59f, 0.38f, -0.15f), XMFLOAT3(-0.99f, -0.13f, 0.0f) },
+    { XMFLOAT3(-0.55f, 0.64f, 0.17f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
+    { XMFLOAT3(-0.55f, 0.64f, -0.13f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
+    { XMFLOAT3(-0.55f, 0.84f, -0.13f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
 
-    { XMFLOAT3(-0.49f, -0.35f, 0.31f), XMFLOAT3(-0.99f, -0.13f, 0.0f) },
-    { XMFLOAT3(-0.59f, 0.38f, -0.15f), XMFLOAT3(-0.99f, -0.13f, 0.0f) },
-    { XMFLOAT3(-0.59f, 0.38f, 0.35f), XMFLOAT3(-0.99f, -0.13f, 0.0f) },
+    { XMFLOAT3(-0.55f, 0.64f, 0.17f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
+    { XMFLOAT3(-0.55f, 0.84f, -0.13f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
+    { XMFLOAT3(-0.55f, 0.84f, 0.17f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
 
-    { XMFLOAT3(-0.09f, 0.38f, 0.35f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-    { XMFLOAT3(-0.09f, 0.96f, 0.35f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-    { XMFLOAT3(0.13f, 0.96f, 0.35f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+    { XMFLOAT3(-0.35f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
+    { XMFLOAT3(-0.55f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
+    { XMFLOAT3(-0.55f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
 
-    { XMFLOAT3(-0.09f, 0.38f, 0.35f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-    { XMFLOAT3(0.13f, 0.96f, 0.35f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-    { XMFLOAT3(0.13f, 0.38f, 0.35f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+    { XMFLOAT3(-0.35f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
+    { XMFLOAT3(-0.55f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
+    { XMFLOAT3(-0.35f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
 
-    { XMFLOAT3(-0.49f, -0.35f, -0.11f), XMFLOAT3(-0.0f, -0.06f, -1.0f) },
-    { XMFLOAT3(-0.07f, -0.35f, -0.11f), XMFLOAT3(-0.0f, -0.06f, -1.0f) },
-    { XMFLOAT3(-0.09f, 0.38f, -0.15f), XMFLOAT3(-0.0f, -0.06f, -1.0f) },
+    { XMFLOAT3(-0.55f, 0.64f, -0.13f), XMFLOAT3(-0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.35f, 0.64f, -0.13f), XMFLOAT3(-0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.35f, 0.84f, -0.13f), XMFLOAT3(-0.0f, 0.0f, -0.5f) },
 
-    { XMFLOAT3(-0.49f, -0.35f, -0.11f), XMFLOAT3(0.0f, -0.06f, -1.0f) },
-    { XMFLOAT3(-0.09f, 0.38f, -0.15f), XMFLOAT3(0.0f, -0.06f, -1.0f) },
-    { XMFLOAT3(-0.59f, 0.38f, -0.15f), XMFLOAT3(0.0f, -0.06f, -1.0f) },
+    { XMFLOAT3(-0.55f, 0.64f, -0.13f), XMFLOAT3(0.0f, -0.0f, -0.5f) },
+    { XMFLOAT3(-0.35f, 0.84f, -0.13f), XMFLOAT3(0.0f, -0.0f, -0.5f) },
+    { XMFLOAT3(-0.55f, 0.84f, -0.13f), XMFLOAT3(0.0f, -0.0f, -0.5f) },
 
-    { XMFLOAT3(-0.07f, -0.35f, 0.31f), XMFLOAT3(0.0f, -0.06f, 1.0f) },
-    { XMFLOAT3(-0.49f, -0.35f, 0.31f), XMFLOAT3(0.0f, -0.06f, 1.0f) },
-    { XMFLOAT3(-0.59f, 0.38f, 0.35f), XMFLOAT3(0.0f, -0.06f, 1.0f) },
+    { XMFLOAT3(-0.35f, 0.64f, 0.17f), XMFLOAT3(-0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(-0.55f, 0.64f, 0.17f), XMFLOAT3(-0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(-0.55f, 0.84f, 0.17f), XMFLOAT3(-0.0f, 0.0f, 0.5f) },
 
-    { XMFLOAT3(-0.07f, -0.35f, 0.31f), XMFLOAT3(0.0f, -0.06f, 1.0f) },
-    { XMFLOAT3(-0.59f, 0.38f, 0.35f), XMFLOAT3(0.0f, -0.06f, 1.0f) },
-    { XMFLOAT3(-0.09f, 0.38f, 0.35f), XMFLOAT3(0.0f, -0.06f, 1.0f) },
+    { XMFLOAT3(-0.35f, 0.64f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(-0.55f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(-0.35f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
 
-    { XMFLOAT3(-0.07f, -0.35f, -0.11f), XMFLOAT3(1.0f, 0.02f, 0.0f) },
-    { XMFLOAT3(-0.07f, -0.35f, 0.31f), XMFLOAT3(1.0f, 0.02f, 0.0f) },
-    { XMFLOAT3(-0.09f, 0.38f, 0.35f), XMFLOAT3(1.0f, 0.02f, 0.0f) },
+    { XMFLOAT3(-0.35f, 0.64f, -0.13f), XMFLOAT3(0.0f, -0.5f, -0.0f) },
+    { XMFLOAT3(-0.35f, 0.64f, 0.17f), XMFLOAT3(0.0f, -0.5f, -0.0f) },
+    { XMFLOAT3(0.06f, 0.64f, 0.17f), XMFLOAT3(0.0f, -0.5f, -0.0f) },
 
-    { XMFLOAT3(-0.07f, -0.35f, -0.11f), XMFLOAT3(1.0f, 0.02f, 0.0f) },
-    { XMFLOAT3(-0.09f, 0.38f, 0.35f), XMFLOAT3(1.0f, 0.02f, 0.0f) },
-    { XMFLOAT3(-0.09f, 0.38f, -0.15f), XMFLOAT3(1.0f, 0.02f, 0.0f) },
+    { XMFLOAT3(-0.35f, 0.64f, -0.13f), XMFLOAT3(-0.0f, -0.5f, 0.0f) },
+    { XMFLOAT3(0.06f, 0.64f, 0.17f), XMFLOAT3(-0.0f, -0.5f, 0.0f) },
+    { XMFLOAT3(0.06f, 0.64f, -0.13f), XMFLOAT3(-0.0f, -0.5f, 0.0f) },
 
-    { XMFLOAT3(-0.09f, 0.96f, 0.35f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-    { XMFLOAT3(-0.59f, 0.96f, 0.35f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-    { XMFLOAT3(-0.59f, 0.96f, -0.15f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+    { XMFLOAT3(-0.55f, -0.81f, 0.17f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
+    { XMFLOAT3(-0.35f, -0.81f, 0.17f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
+    { XMFLOAT3(-0.35f, -0.81f, -0.13f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
 
-    { XMFLOAT3(-0.09f, 0.96f, 0.35f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-    { XMFLOAT3(-0.59f, 0.96f, -0.15f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-    { XMFLOAT3(-0.09f, 0.96f, -0.15f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+    { XMFLOAT3(-0.55f, -0.81f, 0.17f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
+    { XMFLOAT3(-0.35f, -0.81f, -0.13f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
+    { XMFLOAT3(-0.55f, -0.81f, -0.13f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
 
-    { XMFLOAT3(-0.59f, 0.38f, 0.35f), XMFLOAT3(-1.0f, 0.0f, 0.0f) },
-    { XMFLOAT3(-0.59f, 0.38f, -0.15f), XMFLOAT3(-1.0f, 0.0f, 0.0f) },
-    { XMFLOAT3(-0.59f, 0.96f, -0.15f), XMFLOAT3(-1.0f, 0.0f, 0.0f) },
+    { XMFLOAT3(-0.35f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.35f, -0.81f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.05f, -0.81f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
 
-    { XMFLOAT3(-0.59f, 0.38f, 0.35f), XMFLOAT3(-1.0f, 0.0f, 0.0f) },
-    { XMFLOAT3(-0.59f, 0.96f, -0.15f), XMFLOAT3(-1.0f, 0.0f, 0.0f) },
-    { XMFLOAT3(-0.59f, 0.96f, 0.35f), XMFLOAT3(-1.0f, 0.0f, 0.0f) },
+    { XMFLOAT3(-0.35f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.05f, -0.81f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.05f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
 
-    { XMFLOAT3(-0.59f, 0.38f, -0.15f), XMFLOAT3(-0.0f, 0.0f, -1.0f) },
-    { XMFLOAT3(-0.09f, 0.38f, -0.15f), XMFLOAT3(-0.0f, 0.0f, -1.0f) },
-    { XMFLOAT3(-0.09f, 0.96f, -0.15f), XMFLOAT3(-0.0f, 0.0f, -1.0f) },
+    { XMFLOAT3(-0.35f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.55f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.55f, -0.81f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
 
-    { XMFLOAT3(-0.59f, 0.38f, -0.15f), XMFLOAT3(0.0f, -0.0f, -1.0f) },
-    { XMFLOAT3(-0.09f, 0.96f, -0.15f), XMFLOAT3(0.0f, -0.0f, -1.0f) },
-    { XMFLOAT3(-0.59f, 0.96f, -0.15f), XMFLOAT3(0.0f, -0.0f, -1.0f) },
+    { XMFLOAT3(-0.35f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.55f, -0.81f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.35f, -0.81f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
 
-    { XMFLOAT3(-0.09f, 0.38f, 0.35f), XMFLOAT3(-0.0f, 0.0f, 1.0f) },
-    { XMFLOAT3(-0.59f, 0.38f, 0.35f), XMFLOAT3(-0.0f, 0.0f, 1.0f) },
-    { XMFLOAT3(-0.59f, 0.96f, 0.35f), XMFLOAT3(-0.0f, 0.0f, 1.0f) },
+    { XMFLOAT3(-0.55f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(-0.35f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(-0.35f, -0.81f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
 
-    { XMFLOAT3(-0.09f, 0.38f, 0.35f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-    { XMFLOAT3(-0.59f, 0.96f, 0.35f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-    { XMFLOAT3(-0.09f, 0.96f, 0.35f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+    { XMFLOAT3(-0.55f, -0.61f, 0.17f), XMFLOAT3(0.0f, -0.0f, 0.5f) },
+    { XMFLOAT3(-0.35f, -0.81f, 0.17f), XMFLOAT3(0.0f, -0.0f, 0.5f) },
+    { XMFLOAT3(-0.55f, -0.81f, 0.17f), XMFLOAT3(0.0f, -0.0f, 0.5f) },
 
-    { XMFLOAT3(0.13f, 0.38f, 0.35f), XMFLOAT3(-0.0f, 0.0f, 1.0f) },
-    { XMFLOAT3(0.13f, 0.96f, 0.35f), XMFLOAT3(-0.0f, 0.0f, 1.0f) },
-    { XMFLOAT3(0.57f, 0.66f, 0.35f), XMFLOAT3(-0.0f, 0.0f, 1.0f) },
+    { XMFLOAT3(0.06f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.06f, 0.64f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.46f, 0.29f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
 
-    { XMFLOAT3(0.13f, 0.38f, 0.35f), XMFLOAT3(-0.0f, 0.0f, 1.0f) },
-    { XMFLOAT3(0.57f, 0.66f, 0.35f), XMFLOAT3(-0.0f, 0.0f, 1.0f) },
-    { XMFLOAT3(0.57f, 0.08f, 0.35f), XMFLOAT3(-0.0f, 0.0f, 1.0f) },
+    { XMFLOAT3(0.06f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.46f, 0.29f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.66f, 0.29f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
 
-    { XMFLOAT3(-0.09f, 0.96f, 0.35f), XMFLOAT3(0.0f, 1.0f, -0.0f) },
-    { XMFLOAT3(-0.09f, 0.96f, -0.15f), XMFLOAT3(0.0f, 1.0f, -0.0f) },
-    { XMFLOAT3(0.13f, 0.96f, -0.15f), XMFLOAT3(0.0f, 1.0f, -0.0f) },
+    { XMFLOAT3(-0.35f, 0.64f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(-0.35f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.06f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
 
-    { XMFLOAT3(-0.09f, 0.96f, 0.35f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-    { XMFLOAT3(0.13f, 0.96f, -0.15f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-    { XMFLOAT3(0.13f, 0.96f, 0.35f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+    { XMFLOAT3(-0.35f, 0.64f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.06f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.06f, 0.64f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
 
-    { XMFLOAT3(-0.09f, 0.38f, -0.15f), XMFLOAT3(0.0f, -1.0f, -0.0f) },
-    { XMFLOAT3(-0.09f, 0.38f, 0.35f), XMFLOAT3(0.0f, -1.0f, -0.0f) },
-    { XMFLOAT3(0.13f, 0.38f, 0.35f), XMFLOAT3(0.0f, -1.0f, -0.0f) },
+    { XMFLOAT3(-0.35f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.35f, 0.64f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.06f, 0.64f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
 
-    { XMFLOAT3(-0.09f, 0.38f, -0.15f), XMFLOAT3(-0.0f, -1.0f, 0.0f) },
-    { XMFLOAT3(0.13f, 0.38f, 0.35f), XMFLOAT3(-0.0f, -1.0f, 0.0f) },
-    { XMFLOAT3(0.13f, 0.38f, -0.15f), XMFLOAT3(-0.0f, -1.0f, 0.0f) },
+    { XMFLOAT3(-0.35f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.06f, 0.64f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.06f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
 
-    { XMFLOAT3(-0.09f, 0.96f, -0.15f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
-    { XMFLOAT3(-0.09f, 0.38f, -0.15f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
-    { XMFLOAT3(0.13f, 0.38f, -0.15f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
+    { XMFLOAT3(-0.35f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
+    { XMFLOAT3(-0.35f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
+    { XMFLOAT3(0.06f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
 
-    { XMFLOAT3(-0.09f, 0.96f, -0.15f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
-    { XMFLOAT3(0.13f, 0.38f, -0.15f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
-    { XMFLOAT3(0.13f, 0.96f, -0.15f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
+    { XMFLOAT3(-0.35f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
+    { XMFLOAT3(0.06f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
+    { XMFLOAT3(0.06f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
 
-    { XMFLOAT3(0.57f, 0.08f, -0.15f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
-    { XMFLOAT3(0.57f, 0.08f, 0.35f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
-    { XMFLOAT3(0.57f, 0.66f, 0.35f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
+    { XMFLOAT3(0.05f, -0.61f, -0.13f), XMFLOAT3(-0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.05f, -0.81f, -0.13f), XMFLOAT3(-0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.66f, -0.26f, -0.13f), XMFLOAT3(-0.0f, 0.0f, -0.5f) },
 
-    { XMFLOAT3(0.57f, 0.08f, -0.15f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
-    { XMFLOAT3(0.57f, 0.66f, 0.35f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
-    { XMFLOAT3(0.57f, 0.66f, -0.15f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
+    { XMFLOAT3(0.05f, -0.61f, -0.13f), XMFLOAT3(0.0f, -0.0f, -0.5f) },
+    { XMFLOAT3(0.66f, -0.26f, -0.13f), XMFLOAT3(0.0f, -0.0f, -0.5f) },
+    { XMFLOAT3(0.46f, -0.26f, -0.13f), XMFLOAT3(0.0f, -0.0f, -0.5f) },
 
-    { XMFLOAT3(0.13f, 0.38f, -0.15f), XMFLOAT3(-0.56f, -0.83f, -0.0f) },
-    { XMFLOAT3(0.13f, 0.38f, 0.35f), XMFLOAT3(-0.56f, -0.83f, -0.0f) },
-    { XMFLOAT3(0.57f, 0.08f, 0.35f), XMFLOAT3(-0.56f, -0.83f, -0.0f) },
+    { XMFLOAT3(-0.35f, -0.81f, -0.13f), XMFLOAT3(0.0f, -0.5f, -0.0f) },
+    { XMFLOAT3(-0.35f, -0.81f, 0.17f), XMFLOAT3(0.0f, -0.5f, -0.0f) },
+    { XMFLOAT3(0.05f, -0.81f, 0.17f), XMFLOAT3(0.0f, -0.5f, -0.0f) },
 
-    { XMFLOAT3(0.13f, 0.38f, -0.15f), XMFLOAT3(-0.56f, -0.83f, 0.0f) },
-    { XMFLOAT3(0.57f, 0.08f, 0.35f), XMFLOAT3(-0.56f, -0.83f, 0.0f) },
-    { XMFLOAT3(0.57f, 0.08f, -0.15f), XMFLOAT3(-0.56f, -0.83f, 0.0f) },
+    { XMFLOAT3(-0.35f, -0.81f, -0.13f), XMFLOAT3(-0.0f, -0.5f, 0.0f) },
+    { XMFLOAT3(0.05f, -0.81f, 0.17f), XMFLOAT3(-0.0f, -0.5f, 0.0f) },
+    { XMFLOAT3(0.05f, -0.81f, -0.13f), XMFLOAT3(-0.0f, -0.5f, 0.0f) },
 
-    { XMFLOAT3(0.13f, 0.96f, -0.15f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
-    { XMFLOAT3(0.13f, 0.38f, -0.15f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
-    { XMFLOAT3(0.57f, 0.08f, -0.15f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
+    { XMFLOAT3(-0.35f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
+    { XMFLOAT3(-0.35f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
+    { XMFLOAT3(0.05f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
 
-    { XMFLOAT3(0.13f, 0.96f, -0.15f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
-    { XMFLOAT3(0.57f, 0.08f, -0.15f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
-    { XMFLOAT3(0.57f, 0.66f, -0.15f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
+    { XMFLOAT3(-0.35f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
+    { XMFLOAT3(0.05f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
+    { XMFLOAT3(0.05f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
 
-    { XMFLOAT3(0.13f, 0.96f, 0.35f), XMFLOAT3(0.56f, 0.83f, -0.0f) },
-    { XMFLOAT3(0.13f, 0.96f, -0.15f), XMFLOAT3(0.56f, 0.83f, -0.0f) },
-    { XMFLOAT3(0.57f, 0.66f, -0.15f), XMFLOAT3(0.56f, 0.83f, -0.0f) },
+    { XMFLOAT3(-0.35f, -0.81f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(-0.35f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.05f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
 
-    { XMFLOAT3(0.13f, 0.96f, 0.35f), XMFLOAT3(0.56f, 0.83f, 0.0f) },
-    { XMFLOAT3(0.57f, 0.66f, -0.15f), XMFLOAT3(0.56f, 0.83f, 0.0f) },
-    { XMFLOAT3(0.57f, 0.66f, 0.35f), XMFLOAT3(0.56f, 0.83f, 0.0f) },
+    { XMFLOAT3(-0.35f, -0.81f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.05f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.05f, -0.81f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
 
-    { XMFLOAT3(0.11f, -0.35f, -0.11f), XMFLOAT3(-0.01f, -0.09f, -1.0f) },
-    { XMFLOAT3(0.02f, -0.85f, -0.06f), XMFLOAT3(-0.01f, -0.09f, -1.0f) },
-    { XMFLOAT3(0.47f, -0.41f, -0.11f), XMFLOAT3(-0.01f, -0.09f, -1.0f) },
+    { XMFLOAT3(0.46f, 0.29f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.66f, 0.29f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.66f, -0.26f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
 
-    { XMFLOAT3(0.11f, -0.35f, -0.11f), XMFLOAT3(-0.01f, -0.08f, -1.0f) },
-    { XMFLOAT3(0.47f, -0.41f, -0.11f), XMFLOAT3(-0.01f, -0.08f, -1.0f) },
-    { XMFLOAT3(0.57f, 0.08f, -0.15f), XMFLOAT3(-0.01f, -0.08f, -1.0f) },
+    { XMFLOAT3(0.46f, 0.29f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.66f, -0.26f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.46f, -0.26f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
 
-    { XMFLOAT3(-0.12f, -0.85f, 0.26f), XMFLOAT3(0.0f, -0.1f, 1.0f) },
-    { XMFLOAT3(-0.07f, -0.35f, 0.31f), XMFLOAT3(0.0f, -0.1f, 1.0f) },
-    { XMFLOAT3(0.11f, -0.35f, 0.31f), XMFLOAT3(0.0f, -0.1f, 1.0f) },
+    { XMFLOAT3(0.06f, 0.64f, -0.13f), XMFLOAT3(-0.33f, -0.38f, -0.0f) },
+    { XMFLOAT3(0.06f, 0.64f, 0.17f), XMFLOAT3(-0.33f, -0.38f, -0.0f) },
+    { XMFLOAT3(0.46f, 0.29f, 0.17f), XMFLOAT3(-0.33f, -0.38f, -0.0f) },
 
-    { XMFLOAT3(-0.12f, -0.85f, 0.26f), XMFLOAT3(0.0f, -0.1f, 1.0f) },
-    { XMFLOAT3(0.11f, -0.35f, 0.31f), XMFLOAT3(0.0f, -0.1f, 1.0f) },
-    { XMFLOAT3(0.02f, -0.85f, 0.26f), XMFLOAT3(0.0f, -0.1f, 1.0f) },
+    { XMFLOAT3(0.06f, 0.64f, -0.13f), XMFLOAT3(-0.33f, -0.38f, 0.0f) },
+    { XMFLOAT3(0.46f, 0.29f, 0.17f), XMFLOAT3(-0.33f, -0.38f, 0.0f) },
+    { XMFLOAT3(0.46f, 0.29f, -0.13f), XMFLOAT3(-0.33f, -0.38f, 0.0f) },
 
-    { XMFLOAT3(-0.07f, -0.35f, -0.11f), XMFLOAT3(0.0f, -0.1f, -1.0f) },
-    { XMFLOAT3(-0.12f, -0.85f, -0.06f), XMFLOAT3(0.0f, -0.1f, -1.0f) },
-    { XMFLOAT3(0.02f, -0.85f, -0.06f), XMFLOAT3(0.0f, -0.1f, -1.0f) },
+    { XMFLOAT3(0.06f, 0.64f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.06f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.66f, 0.29f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
 
-    { XMFLOAT3(-0.07f, -0.35f, -0.11f), XMFLOAT3(-0.0f, -0.1f, -1.0f) },
-    { XMFLOAT3(0.02f, -0.85f, -0.06f), XMFLOAT3(-0.0f, -0.1f, -1.0f) },
-    { XMFLOAT3(0.11f, -0.35f, -0.11f), XMFLOAT3(-0.0f, -0.1f, -1.0f) },
+    { XMFLOAT3(0.06f, 0.64f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.66f, 0.29f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.46f, 0.29f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
 
-    { XMFLOAT3(-0.12f, -0.85f, -0.06f), XMFLOAT3(0.0f, -1.0f, -0.0f) },
-    { XMFLOAT3(-0.12f, -0.85f, 0.26f), XMFLOAT3(0.0f, -1.0f, -0.0f) },
-    { XMFLOAT3(0.02f, -0.85f, 0.26f), XMFLOAT3(0.0f, -1.0f, -0.0f) },
+    { XMFLOAT3(0.06f, 0.84f, 0.17f), XMFLOAT3(0.34f, 0.37f, -0.0f) },
+    { XMFLOAT3(0.06f, 0.84f, -0.13f), XMFLOAT3(0.34f, 0.37f, -0.0f) },
+    { XMFLOAT3(0.66f, 0.29f, -0.13f), XMFLOAT3(0.34f, 0.37f, -0.0f) },
 
-    { XMFLOAT3(-0.12f, -0.85f, -0.06f), XMFLOAT3(-0.0f, -1.0f, 0.0f) },
-    { XMFLOAT3(0.02f, -0.85f, 0.26f), XMFLOAT3(-0.0f, -1.0f, 0.0f) },
-    { XMFLOAT3(0.02f, -0.85f, -0.06f), XMFLOAT3(-0.0f, -1.0f, 0.0f) },
+    { XMFLOAT3(0.06f, 0.84f, 0.17f), XMFLOAT3(0.34f, 0.37f, 0.0f) },
+    { XMFLOAT3(0.66f, 0.29f, -0.13f), XMFLOAT3(0.34f, 0.37f, 0.0f) },
+    { XMFLOAT3(0.66f, 0.29f, 0.17f), XMFLOAT3(0.34f, 0.37f, 0.0f) },
 
-    { XMFLOAT3(0.47f, -0.41f, 0.31f), XMFLOAT3(0.98f, -0.18f, 0.0f) },
-    { XMFLOAT3(0.57f, 0.08f, 0.35f), XMFLOAT3(0.98f, -0.18f, 0.0f) },
-    { XMFLOAT3(0.57f, 0.08f, -0.15f), XMFLOAT3(0.98f, -0.18f, 0.0f) },
+    { XMFLOAT3(0.46f, -0.26f, -0.13f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
+    { XMFLOAT3(0.46f, -0.26f, 0.17f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
+    { XMFLOAT3(0.66f, -0.26f, 0.17f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
 
-    { XMFLOAT3(0.47f, -0.41f, 0.31f), XMFLOAT3(0.98f, -0.18f, 0.0f) },
-    { XMFLOAT3(0.57f, 0.08f, -0.15f), XMFLOAT3(0.98f, -0.18f, 0.0f) },
-    { XMFLOAT3(0.47f, -0.41f, -0.11f), XMFLOAT3(0.98f, -0.18f, 0.0f) },
+    { XMFLOAT3(0.46f, -0.26f, -0.13f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
+    { XMFLOAT3(0.66f, -0.26f, 0.17f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
+    { XMFLOAT3(0.66f, -0.26f, -0.13f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
 
-    { XMFLOAT3(0.02f, -0.85f, -0.06f), XMFLOAT3(0.7f, -0.72f, 0.0f) },
-    { XMFLOAT3(0.02f, -0.85f, 0.26f), XMFLOAT3(0.7f, -0.72f, 0.0f) },
-    { XMFLOAT3(0.47f, -0.41f, 0.31f), XMFLOAT3(0.7f, -0.72f, 0.0f) },
+    { XMFLOAT3(0.66f, 0.29f, 0.17f), XMFLOAT3(0.5f, 0.0f, -0.0f) },
+    { XMFLOAT3(0.66f, 0.29f, -0.13f), XMFLOAT3(0.5f, 0.0f, -0.0f) },
+    { XMFLOAT3(0.66f, -0.26f, -0.13f), XMFLOAT3(0.5f, 0.0f, -0.0f) },
 
-    { XMFLOAT3(0.02f, -0.85f, -0.06f), XMFLOAT3(0.7f, -0.72f, 0.0f) },
-    { XMFLOAT3(0.47f, -0.41f, 0.31f), XMFLOAT3(0.7f, -0.72f, 0.0f) },
-    { XMFLOAT3(0.47f, -0.41f, -0.11f), XMFLOAT3(0.7f, -0.72f, 0.0f) },
+    { XMFLOAT3(0.66f, 0.29f, 0.17f), XMFLOAT3(0.5f, 0.0f, 0.0f) },
+    { XMFLOAT3(0.66f, -0.26f, -0.13f), XMFLOAT3(0.5f, 0.0f, 0.0f) },
+    { XMFLOAT3(0.66f, -0.26f, 0.17f), XMFLOAT3(0.5f, 0.0f, 0.0f) },
 
-    { XMFLOAT3(0.11f, -0.35f, 0.31f), XMFLOAT3(-0.69f, 0.72f, 0.0f) },
-    { XMFLOAT3(0.11f, -0.35f, -0.11f), XMFLOAT3(-0.69f, 0.72f, 0.0f) },
-    { XMFLOAT3(0.57f, 0.08f, -0.15f), XMFLOAT3(-0.69f, 0.72f, 0.0f) },
+    { XMFLOAT3(0.66f, 0.29f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.46f, 0.29f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.46f, -0.26f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
 
-    { XMFLOAT3(0.11f, -0.35f, 0.31f), XMFLOAT3(-0.69f, 0.72f, 0.0f) },
-    { XMFLOAT3(0.57f, 0.08f, -0.15f), XMFLOAT3(-0.69f, 0.72f, 0.0f) },
-    { XMFLOAT3(0.57f, 0.08f, 0.35f), XMFLOAT3(-0.69f, 0.72f, 0.0f) },
+    { XMFLOAT3(0.66f, 0.29f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.46f, -0.26f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.66f, -0.26f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
 
-    { XMFLOAT3(0.02f, -0.85f, 0.26f), XMFLOAT3(0.01f, -0.1f, 1.0f) },
-    { XMFLOAT3(0.11f, -0.35f, 0.31f), XMFLOAT3(0.01f, -0.1f, 1.0f) },
-    { XMFLOAT3(0.57f, 0.08f, 0.35f), XMFLOAT3(0.01f, -0.1f, 1.0f) },
+    { XMFLOAT3(0.46f, 0.29f, -0.13f), XMFLOAT3(-0.5f, -0.0f, -0.0f) },
+    { XMFLOAT3(0.46f, 0.29f, 0.17f), XMFLOAT3(-0.5f, -0.0f, -0.0f) },
+    { XMFLOAT3(0.46f, -0.26f, 0.17f), XMFLOAT3(-0.5f, -0.0f, -0.0f) },
 
-    { XMFLOAT3(0.02f, -0.85f, 0.26f), XMFLOAT3(-0.03f, -0.08f, 1.0f) },
-    { XMFLOAT3(0.57f, 0.08f, 0.35f), XMFLOAT3(-0.03f, -0.08f, 1.0f) },
-    { XMFLOAT3(0.47f, -0.41f, 0.31f), XMFLOAT3(-0.03f, -0.08f, 1.0f) },
+    { XMFLOAT3(0.46f, 0.29f, -0.13f), XMFLOAT3(-0.5f, -0.0f, 0.0f) },
+    { XMFLOAT3(0.46f, -0.26f, 0.17f), XMFLOAT3(-0.5f, -0.0f, 0.0f) },
+    { XMFLOAT3(0.46f, -0.26f, -0.13f), XMFLOAT3(-0.5f, -0.0f, 0.0f) },
+
+    { XMFLOAT3(0.46f, -0.26f, 0.17f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
+    { XMFLOAT3(0.46f, -0.26f, -0.13f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
+    { XMFLOAT3(0.66f, -0.26f, -0.13f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
+
+    { XMFLOAT3(0.46f, -0.26f, 0.17f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
+    { XMFLOAT3(0.66f, -0.26f, -0.13f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
+    { XMFLOAT3(0.66f, -0.26f, 0.17f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
+
+    { XMFLOAT3(0.05f, -0.61f, 0.17f), XMFLOAT3(-0.32f, 0.38f, 0.0f) },
+    { XMFLOAT3(0.05f, -0.61f, -0.13f), XMFLOAT3(-0.32f, 0.38f, 0.0f) },
+    { XMFLOAT3(0.46f, -0.26f, -0.13f), XMFLOAT3(-0.32f, 0.38f, 0.0f) },
+
+    { XMFLOAT3(0.05f, -0.61f, 0.17f), XMFLOAT3(-0.32f, 0.38f, 0.0f) },
+    { XMFLOAT3(0.46f, -0.26f, -0.13f), XMFLOAT3(-0.32f, 0.38f, 0.0f) },
+    { XMFLOAT3(0.46f, -0.26f, 0.17f), XMFLOAT3(-0.32f, 0.38f, 0.0f) },
+
+    { XMFLOAT3(0.05f, -0.81f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.05f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.46f, -0.26f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+
+    { XMFLOAT3(0.05f, -0.81f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.46f, -0.26f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.66f, -0.26f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+
+    { XMFLOAT3(0.05f, -0.81f, -0.13f), XMFLOAT3(0.33f, -0.37f, 0.0f) },
+    { XMFLOAT3(0.05f, -0.81f, 0.17f), XMFLOAT3(0.33f, -0.37f, 0.0f) },
+    { XMFLOAT3(0.66f, -0.26f, 0.17f), XMFLOAT3(0.33f, -0.37f, 0.0f) },
+
+    { XMFLOAT3(0.05f, -0.81f, -0.13f), XMFLOAT3(0.33f, -0.37f, 0.0f) },
+    { XMFLOAT3(0.66f, -0.26f, 0.17f), XMFLOAT3(0.33f, -0.37f, 0.0f) },
+    { XMFLOAT3(0.66f, -0.26f, -0.13f), XMFLOAT3(0.33f, -0.37f, 0.0f) },
 
     };
 
     WORD indices[] = {
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, };
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, };
 
-    g_nTriangles = 60;
-    g_nVertices = 180;
+    g_nTriangles = 68;
+    g_nVertices = 204;
+
+
+    for (int i = 0; i < g_nVertices; i++)
+    {
+        //vertices[i].Pos.x += vertices[i].Pos.x * vertices[i].Pos.y;
+        vertices[i].Pos.z += vertices[i].Pos.z * vertices[i].Pos.y;
+    }
 
     HRESULT hr = S_OK;
 
@@ -855,6 +894,8 @@ void Render()
 
     // Rotate around the origin
 	g_World = XMMatrixRotationY( t );
+
+    g_World *= XMMatrixScaling(sin(t) * cos(t) + 1, sin(t) * cos(t) + 1, sin(t) * cos(t) + 1);
 	
 
     // Setup our lighting parameters
