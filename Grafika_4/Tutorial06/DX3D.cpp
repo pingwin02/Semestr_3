@@ -22,12 +22,12 @@ struct SimpleVertex
 
 struct ConstantBuffer
 {
-	XMMATRIX mWorld;
-	XMMATRIX mView;
-	XMMATRIX mProjection;
-	XMFLOAT4 vLightDir;
-	XMFLOAT4 vLightColor;
-	XMFLOAT4 vOutputColor;
+    XMMATRIX mWorld;
+    XMMATRIX mView;
+    XMMATRIX mProjection;
+    XMFLOAT4 vLightDir;
+    XMFLOAT4 vLightColor;
+    XMFLOAT4 vOutputColor;
 };
 
 
@@ -38,40 +38,43 @@ HINSTANCE               g_hInst = nullptr;
 HWND                    g_hWnd = nullptr;
 D3D_DRIVER_TYPE         g_driverType = D3D_DRIVER_TYPE_NULL;
 D3D_FEATURE_LEVEL       g_featureLevel = D3D_FEATURE_LEVEL_11_0;
-ID3D11Device*           g_pd3dDevice = nullptr;
-ID3D11Device1*          g_pd3dDevice1 = nullptr;
-ID3D11DeviceContext*    g_pImmediateContext = nullptr;
-ID3D11DeviceContext1*   g_pImmediateContext1 = nullptr;
-IDXGISwapChain*         g_pSwapChain = nullptr;
-IDXGISwapChain1*        g_pSwapChain1 = nullptr;
+ID3D11Device* g_pd3dDevice = nullptr;
+ID3D11Device1* g_pd3dDevice1 = nullptr;
+ID3D11DeviceContext* g_pImmediateContext = nullptr;
+ID3D11DeviceContext1* g_pImmediateContext1 = nullptr;
+IDXGISwapChain* g_pSwapChain = nullptr;
+IDXGISwapChain1* g_pSwapChain1 = nullptr;
 ID3D11RenderTargetView* g_pRenderTargetView = nullptr;
-ID3D11Texture2D*        g_pDepthStencil = nullptr;
+ID3D11Texture2D* g_pDepthStencil = nullptr;
 ID3D11DepthStencilView* g_pDepthStencilView = nullptr;
-ID3D11VertexShader*     g_pVertexShader = nullptr;
-ID3D11PixelShader*      g_pPixelShader = nullptr;
-ID3D11PixelShader*      g_pPixelShaderSolid = nullptr;
-ID3D11InputLayout*      g_pVertexLayout = nullptr;
-ID3D11Buffer*           g_pVertexBuffer = nullptr;
-ID3D11Buffer*           g_pIndexBuffer = nullptr;
-ID3D11Buffer*           g_pConstantBuffer = nullptr;
-ID3D11RasterizerState*  g_rasterState = nullptr;
+ID3D11VertexShader* g_pVertexShader = nullptr;
+ID3D11PixelShader* g_pPixelShader = nullptr;
+ID3D11PixelShader* g_pPixelShaderSolid = nullptr;
+ID3D11InputLayout* g_pVertexLayout = nullptr;
+ID3D11Buffer* g_pVertexBuffer = nullptr;
+ID3D11Buffer* g_pIndexBuffer = nullptr;
+ID3D11Buffer* g_pConstantBuffer = nullptr;
+ID3D11RasterizerState* g_rasterState = nullptr;
 XMMATRIX                g_World;
 XMMATRIX                g_World2;
 XMMATRIX                g_View;
 XMMATRIX                g_Projection;
 int						g_nVertices;
 int						g_nTriangles;
-float                   scale = 1;
-float                   angle = 0;
+float                   angleX = 0;
+float                   angleY = 0;
+float                   posX = 0;
+float                   posY = 0;
+float                   posZ = 0;
 
 
 //--------------------------------------------------------------------------------------
 // Forward declarations
 //--------------------------------------------------------------------------------------
-HRESULT InitWindow( HINSTANCE hInstance, int nCmdShow );
+HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow);
 HRESULT InitDevice();
 void CleanupDevice();
-LRESULT CALLBACK    WndProc( HWND, UINT, WPARAM, LPARAM );
+LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 void Render();
 
 
@@ -79,28 +82,28 @@ void Render();
 // Entry point to the program. Initializes everything and goes into a message processing 
 // loop. Idle time is used to render the scene.
 //--------------------------------------------------------------------------------------
-int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow )
+int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
-    UNREFERENCED_PARAMETER( hPrevInstance );
-    UNREFERENCED_PARAMETER( lpCmdLine );
+    UNREFERENCED_PARAMETER(hPrevInstance);
+    UNREFERENCED_PARAMETER(lpCmdLine);
 
-    if( FAILED( InitWindow( hInstance, nCmdShow ) ) )
+    if (FAILED(InitWindow(hInstance, nCmdShow)))
         return 0;
 
-    if( FAILED( InitDevice() ) )
+    if (FAILED(InitDevice()))
     {
         CleanupDevice();
         return 0;
     }
 
     // Main message loop
-    MSG msg = {0};
-    while( WM_QUIT != msg.message )
+    MSG msg = { 0 };
+    while (WM_QUIT != msg.message)
     {
-        if( PeekMessage( &msg, nullptr, 0, 0, PM_REMOVE ) )
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
-            TranslateMessage( &msg );
-            DispatchMessage( &msg );
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
         }
         else
         {
@@ -110,44 +113,44 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
     CleanupDevice();
 
-    return ( int )msg.wParam;
+    return (int)msg.wParam;
 }
 
 
 //--------------------------------------------------------------------------------------
 // Register class and create window
 //--------------------------------------------------------------------------------------
-HRESULT InitWindow( HINSTANCE hInstance, int nCmdShow )
+HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow)
 {
     // Register class
     WNDCLASSEX wcex;
-    wcex.cbSize = sizeof( WNDCLASSEX );
+    wcex.cbSize = sizeof(WNDCLASSEX);
     wcex.style = CS_HREDRAW | CS_VREDRAW;
     wcex.lpfnWndProc = WndProc;
     wcex.cbClsExtra = 0;
     wcex.cbWndExtra = 0;
     wcex.hInstance = hInstance;
-    wcex.hIcon = LoadIcon( hInstance, ( LPCTSTR )IDI_TUTORIAL1 );
-    wcex.hCursor = LoadCursor( nullptr, IDC_ARROW );
-    wcex.hbrBackground = ( HBRUSH )( COLOR_WINDOW + 1 );
+    wcex.hIcon = LoadIcon(hInstance, (LPCTSTR)IDI_TUTORIAL1);
+    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     wcex.lpszMenuName = nullptr;
     wcex.lpszClassName = L"GK-DX3DWindowClass";
-    wcex.hIconSm = LoadIcon( wcex.hInstance, ( LPCTSTR )IDI_TUTORIAL1 );
-    if( !RegisterClassEx( &wcex ) )
+    wcex.hIconSm = LoadIcon(wcex.hInstance, (LPCTSTR)IDI_TUTORIAL1);
+    if (!RegisterClassEx(&wcex))
         return E_FAIL;
 
     // Create window
     g_hInst = hInstance;
     RECT rc = { 0, 0, 800, 600 };
-    AdjustWindowRect( &rc, WS_OVERLAPPEDWINDOW, FALSE );
-    g_hWnd = CreateWindow( L"GK-DX3DWindowClass", L"Direct3D 11",
-                           WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
-                           CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance,
-                           nullptr );
-    if( !g_hWnd )
+    AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
+    g_hWnd = CreateWindow(L"GK-DX3DWindowClass", L"Direct3D 11",
+        WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
+        CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance,
+        nullptr);
+    if (!g_hWnd)
         return E_FAIL;
 
-    ShowWindow( g_hWnd, nCmdShow );
+    ShowWindow(g_hWnd, nCmdShow);
 
     return S_OK;
 }
@@ -157,7 +160,7 @@ HRESULT InitWindow( HINSTANCE hInstance, int nCmdShow )
 // Helper for compiling shaders with D3DCompile
 //
 //--------------------------------------------------------------------------------------
-HRESULT CompileShaderFromFile( WCHAR* szFileName, LPCSTR szEntryPoint, LPCSTR szShaderModel, ID3DBlob** ppBlobOut )
+HRESULT CompileShaderFromFile(WCHAR* szFileName, LPCSTR szEntryPoint, LPCSTR szShaderModel, ID3DBlob** ppBlobOut)
 {
     HRESULT hr = S_OK;
 
@@ -174,18 +177,18 @@ HRESULT CompileShaderFromFile( WCHAR* szFileName, LPCSTR szEntryPoint, LPCSTR sz
 #endif
 
     ID3DBlob* pErrorBlob = nullptr;
-    hr = D3DCompileFromFile( szFileName, nullptr, nullptr, szEntryPoint, szShaderModel, 
-        dwShaderFlags, 0, ppBlobOut, &pErrorBlob );
-    if( FAILED(hr) )
+    hr = D3DCompileFromFile(szFileName, nullptr, nullptr, szEntryPoint, szShaderModel,
+        dwShaderFlags, 0, ppBlobOut, &pErrorBlob);
+    if (FAILED(hr))
     {
-        if( pErrorBlob )
+        if (pErrorBlob)
         {
-            OutputDebugStringA( reinterpret_cast<const char*>( pErrorBlob->GetBufferPointer() ) );
+            OutputDebugStringA(reinterpret_cast<const char*>(pErrorBlob->GetBufferPointer()));
             pErrorBlob->Release();
         }
         return hr;
     }
-    if( pErrorBlob ) pErrorBlob->Release();
+    if (pErrorBlob) pErrorBlob->Release();
 
     return S_OK;
 }
@@ -196,298 +199,197 @@ HRESULT CompileShaderFromFile( WCHAR* szFileName, LPCSTR szEntryPoint, LPCSTR sz
 //--------------------------------------------------------------------------------------
 HRESULT InitDevice()
 {
+
     SimpleVertex vertices[] = {
-    { XMFLOAT3(-0.55f, -0.61f, -0.13f), XMFLOAT3(-0.5f, -0.0f, 0.0f) },
-    { XMFLOAT3(-0.55f, 0.64f, -0.13f), XMFLOAT3(-0.5f, -0.0f, 0.0f) },
-    { XMFLOAT3(-0.55f, 0.64f, 0.17f), XMFLOAT3(-0.5f, -0.0f, 0.0f) },
-
-    { XMFLOAT3(-0.55f, -0.61f, -0.13f), XMFLOAT3(-0.5f, 0.0f, -0.0f) },
-    { XMFLOAT3(-0.55f, 0.64f, 0.17f), XMFLOAT3(-0.5f, 0.0f, -0.0f) },
-    { XMFLOAT3(-0.55f, -0.61f, 0.17f), XMFLOAT3(-0.5f, 0.0f, -0.0f) },
-
-    { XMFLOAT3(-0.55f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(-0.55f, 0.64f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(-0.35f, 0.64f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-
-    { XMFLOAT3(-0.55f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(-0.35f, 0.64f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(-0.35f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-
-    { XMFLOAT3(-0.35f, -0.61f, 0.17f), XMFLOAT3(0.5f, 0.0f, 0.0f) },
-    { XMFLOAT3(-0.35f, 0.64f, 0.17f), XMFLOAT3(0.5f, 0.0f, 0.0f) },
-    { XMFLOAT3(-0.35f, 0.64f, -0.13f), XMFLOAT3(0.5f, 0.0f, 0.0f) },
-
-    { XMFLOAT3(-0.35f, -0.61f, 0.17f), XMFLOAT3(0.5f, 0.0f, -0.0f) },
-    { XMFLOAT3(-0.35f, 0.64f, -0.13f), XMFLOAT3(0.5f, 0.0f, -0.0f) },
-    { XMFLOAT3(-0.35f, -0.61f, -0.13f), XMFLOAT3(0.5f, 0.0f, -0.0f) },
-
-    { XMFLOAT3(-0.35f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(-0.35f, 0.64f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(-0.55f, 0.64f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-
-    { XMFLOAT3(-0.35f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(-0.55f, 0.64f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(-0.55f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-
-    { XMFLOAT3(-0.55f, -0.61f, -0.13f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
-    { XMFLOAT3(-0.55f, -0.61f, 0.17f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
-    { XMFLOAT3(-0.55f, -0.81f, 0.17f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
-
-    { XMFLOAT3(-0.55f, -0.61f, -0.13f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
-    { XMFLOAT3(-0.55f, -0.81f, 0.17f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
-    { XMFLOAT3(-0.55f, -0.81f, -0.13f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
-
-    { XMFLOAT3(-0.55f, 0.64f, 0.17f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
-    { XMFLOAT3(-0.55f, 0.64f, -0.13f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
-    { XMFLOAT3(-0.55f, 0.84f, -0.13f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
-
-    { XMFLOAT3(-0.55f, 0.64f, 0.17f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
-    { XMFLOAT3(-0.55f, 0.84f, -0.13f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
-    { XMFLOAT3(-0.55f, 0.84f, 0.17f), XMFLOAT3(-0.5f, 0.0f, 0.0f) },
-
-    { XMFLOAT3(-0.35f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
-    { XMFLOAT3(-0.55f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
-    { XMFLOAT3(-0.55f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
-
-    { XMFLOAT3(-0.35f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
-    { XMFLOAT3(-0.55f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
-    { XMFLOAT3(-0.35f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
-
-    { XMFLOAT3(-0.55f, 0.64f, -0.13f), XMFLOAT3(-0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(-0.35f, 0.64f, -0.13f), XMFLOAT3(-0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(-0.35f, 0.84f, -0.13f), XMFLOAT3(-0.0f, 0.0f, -0.5f) },
-
-    { XMFLOAT3(-0.55f, 0.64f, -0.13f), XMFLOAT3(0.0f, -0.0f, -0.5f) },
-    { XMFLOAT3(-0.35f, 0.84f, -0.13f), XMFLOAT3(0.0f, -0.0f, -0.5f) },
-    { XMFLOAT3(-0.55f, 0.84f, -0.13f), XMFLOAT3(0.0f, -0.0f, -0.5f) },
-
-    { XMFLOAT3(-0.35f, 0.64f, 0.17f), XMFLOAT3(-0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(-0.55f, 0.64f, 0.17f), XMFLOAT3(-0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(-0.55f, 0.84f, 0.17f), XMFLOAT3(-0.0f, 0.0f, 0.5f) },
-
-    { XMFLOAT3(-0.35f, 0.64f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(-0.55f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(-0.35f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-
-    { XMFLOAT3(-0.35f, 0.64f, -0.13f), XMFLOAT3(0.0f, -0.5f, -0.0f) },
-    { XMFLOAT3(-0.35f, 0.64f, 0.17f), XMFLOAT3(0.0f, -0.5f, -0.0f) },
-    { XMFLOAT3(0.06f, 0.64f, 0.17f), XMFLOAT3(0.0f, -0.5f, -0.0f) },
-
-    { XMFLOAT3(-0.35f, 0.64f, -0.13f), XMFLOAT3(-0.0f, -0.5f, 0.0f) },
-    { XMFLOAT3(0.06f, 0.64f, 0.17f), XMFLOAT3(-0.0f, -0.5f, 0.0f) },
-    { XMFLOAT3(0.06f, 0.64f, -0.13f), XMFLOAT3(-0.0f, -0.5f, 0.0f) },
-
-    { XMFLOAT3(-0.55f, -0.81f, 0.17f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
-    { XMFLOAT3(-0.35f, -0.81f, 0.17f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
-    { XMFLOAT3(-0.35f, -0.81f, -0.13f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
-
-    { XMFLOAT3(-0.55f, -0.81f, 0.17f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
-    { XMFLOAT3(-0.35f, -0.81f, -0.13f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
-    { XMFLOAT3(-0.55f, -0.81f, -0.13f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
-
-    { XMFLOAT3(-0.35f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(-0.35f, -0.81f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(0.05f, -0.81f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-
-    { XMFLOAT3(-0.35f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(0.05f, -0.81f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(0.05f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-
-    { XMFLOAT3(-0.35f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(-0.55f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(-0.55f, -0.81f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-
-    { XMFLOAT3(-0.35f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(-0.55f, -0.81f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(-0.35f, -0.81f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-
-    { XMFLOAT3(-0.55f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(-0.35f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(-0.35f, -0.81f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-
-    { XMFLOAT3(-0.55f, -0.61f, 0.17f), XMFLOAT3(0.0f, -0.0f, 0.5f) },
-    { XMFLOAT3(-0.35f, -0.81f, 0.17f), XMFLOAT3(0.0f, -0.0f, 0.5f) },
-    { XMFLOAT3(-0.55f, -0.81f, 0.17f), XMFLOAT3(0.0f, -0.0f, 0.5f) },
-
-    { XMFLOAT3(0.06f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(0.06f, 0.64f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(0.46f, 0.29f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-
-    { XMFLOAT3(0.06f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(0.46f, 0.29f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(0.66f, 0.29f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-
-    { XMFLOAT3(-0.35f, 0.64f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(-0.35f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(0.06f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-
-    { XMFLOAT3(-0.35f, 0.64f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(0.06f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(0.06f, 0.64f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-
-    { XMFLOAT3(-0.35f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(-0.35f, 0.64f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(0.06f, 0.64f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-
-    { XMFLOAT3(-0.35f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(0.06f, 0.64f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(0.06f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-
-    { XMFLOAT3(-0.35f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
-    { XMFLOAT3(-0.35f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
-    { XMFLOAT3(0.06f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
-
-    { XMFLOAT3(-0.35f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
-    { XMFLOAT3(0.06f, 0.84f, -0.13f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
-    { XMFLOAT3(0.06f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
-
-    { XMFLOAT3(0.05f, -0.61f, -0.13f), XMFLOAT3(-0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(0.05f, -0.81f, -0.13f), XMFLOAT3(-0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(0.66f, -0.26f, -0.13f), XMFLOAT3(-0.0f, 0.0f, -0.5f) },
-
-    { XMFLOAT3(0.05f, -0.61f, -0.13f), XMFLOAT3(0.0f, -0.0f, -0.5f) },
-    { XMFLOAT3(0.66f, -0.26f, -0.13f), XMFLOAT3(0.0f, -0.0f, -0.5f) },
-    { XMFLOAT3(0.46f, -0.26f, -0.13f), XMFLOAT3(0.0f, -0.0f, -0.5f) },
-
-    { XMFLOAT3(-0.35f, -0.81f, -0.13f), XMFLOAT3(0.0f, -0.5f, -0.0f) },
-    { XMFLOAT3(-0.35f, -0.81f, 0.17f), XMFLOAT3(0.0f, -0.5f, -0.0f) },
-    { XMFLOAT3(0.05f, -0.81f, 0.17f), XMFLOAT3(0.0f, -0.5f, -0.0f) },
-
-    { XMFLOAT3(-0.35f, -0.81f, -0.13f), XMFLOAT3(-0.0f, -0.5f, 0.0f) },
-    { XMFLOAT3(0.05f, -0.81f, 0.17f), XMFLOAT3(-0.0f, -0.5f, 0.0f) },
-    { XMFLOAT3(0.05f, -0.81f, -0.13f), XMFLOAT3(-0.0f, -0.5f, 0.0f) },
-
-    { XMFLOAT3(-0.35f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
-    { XMFLOAT3(-0.35f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
-    { XMFLOAT3(0.05f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
-
-    { XMFLOAT3(-0.35f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
-    { XMFLOAT3(0.05f, -0.61f, -0.13f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
-    { XMFLOAT3(0.05f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
-
-    { XMFLOAT3(-0.35f, -0.81f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(-0.35f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(0.05f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-
-    { XMFLOAT3(-0.35f, -0.81f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(0.05f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(0.05f, -0.81f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-
-    { XMFLOAT3(0.46f, 0.29f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(0.66f, 0.29f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(0.66f, -0.26f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-
-    { XMFLOAT3(0.46f, 0.29f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(0.66f, -0.26f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(0.46f, -0.26f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-
-    { XMFLOAT3(0.06f, 0.64f, -0.13f), XMFLOAT3(-0.33f, -0.38f, -0.0f) },
-    { XMFLOAT3(0.06f, 0.64f, 0.17f), XMFLOAT3(-0.33f, -0.38f, -0.0f) },
-    { XMFLOAT3(0.46f, 0.29f, 0.17f), XMFLOAT3(-0.33f, -0.38f, -0.0f) },
-
-    { XMFLOAT3(0.06f, 0.64f, -0.13f), XMFLOAT3(-0.33f, -0.38f, 0.0f) },
-    { XMFLOAT3(0.46f, 0.29f, 0.17f), XMFLOAT3(-0.33f, -0.38f, 0.0f) },
-    { XMFLOAT3(0.46f, 0.29f, -0.13f), XMFLOAT3(-0.33f, -0.38f, 0.0f) },
-
-    { XMFLOAT3(0.06f, 0.64f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(0.06f, 0.84f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(0.66f, 0.29f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-
-    { XMFLOAT3(0.06f, 0.64f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(0.66f, 0.29f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(0.46f, 0.29f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-
-    { XMFLOAT3(0.06f, 0.84f, 0.17f), XMFLOAT3(0.34f, 0.37f, -0.0f) },
-    { XMFLOAT3(0.06f, 0.84f, -0.13f), XMFLOAT3(0.34f, 0.37f, -0.0f) },
-    { XMFLOAT3(0.66f, 0.29f, -0.13f), XMFLOAT3(0.34f, 0.37f, -0.0f) },
-
-    { XMFLOAT3(0.06f, 0.84f, 0.17f), XMFLOAT3(0.34f, 0.37f, 0.0f) },
-    { XMFLOAT3(0.66f, 0.29f, -0.13f), XMFLOAT3(0.34f, 0.37f, 0.0f) },
-    { XMFLOAT3(0.66f, 0.29f, 0.17f), XMFLOAT3(0.34f, 0.37f, 0.0f) },
-
-    { XMFLOAT3(0.46f, -0.26f, -0.13f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
-    { XMFLOAT3(0.46f, -0.26f, 0.17f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
-    { XMFLOAT3(0.66f, -0.26f, 0.17f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
-
-    { XMFLOAT3(0.46f, -0.26f, -0.13f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
-    { XMFLOAT3(0.66f, -0.26f, 0.17f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
-    { XMFLOAT3(0.66f, -0.26f, -0.13f), XMFLOAT3(0.0f, -0.5f, 0.0f) },
-
-    { XMFLOAT3(0.66f, 0.29f, 0.17f), XMFLOAT3(0.5f, 0.0f, -0.0f) },
-    { XMFLOAT3(0.66f, 0.29f, -0.13f), XMFLOAT3(0.5f, 0.0f, -0.0f) },
-    { XMFLOAT3(0.66f, -0.26f, -0.13f), XMFLOAT3(0.5f, 0.0f, -0.0f) },
-
-    { XMFLOAT3(0.66f, 0.29f, 0.17f), XMFLOAT3(0.5f, 0.0f, 0.0f) },
-    { XMFLOAT3(0.66f, -0.26f, -0.13f), XMFLOAT3(0.5f, 0.0f, 0.0f) },
-    { XMFLOAT3(0.66f, -0.26f, 0.17f), XMFLOAT3(0.5f, 0.0f, 0.0f) },
-
-    { XMFLOAT3(0.66f, 0.29f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(0.46f, 0.29f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(0.46f, -0.26f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-
-    { XMFLOAT3(0.66f, 0.29f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(0.46f, -0.26f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-    { XMFLOAT3(0.66f, -0.26f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
-
-    { XMFLOAT3(0.46f, 0.29f, -0.13f), XMFLOAT3(-0.5f, -0.0f, -0.0f) },
-    { XMFLOAT3(0.46f, 0.29f, 0.17f), XMFLOAT3(-0.5f, -0.0f, -0.0f) },
-    { XMFLOAT3(0.46f, -0.26f, 0.17f), XMFLOAT3(-0.5f, -0.0f, -0.0f) },
-
-    { XMFLOAT3(0.46f, 0.29f, -0.13f), XMFLOAT3(-0.5f, -0.0f, 0.0f) },
-    { XMFLOAT3(0.46f, -0.26f, 0.17f), XMFLOAT3(-0.5f, -0.0f, 0.0f) },
-    { XMFLOAT3(0.46f, -0.26f, -0.13f), XMFLOAT3(-0.5f, -0.0f, 0.0f) },
-
-    { XMFLOAT3(0.46f, -0.26f, 0.17f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
-    { XMFLOAT3(0.46f, -0.26f, -0.13f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
-    { XMFLOAT3(0.66f, -0.26f, -0.13f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
-
-    { XMFLOAT3(0.46f, -0.26f, 0.17f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
-    { XMFLOAT3(0.66f, -0.26f, -0.13f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
-    { XMFLOAT3(0.66f, -0.26f, 0.17f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
-
-    { XMFLOAT3(0.05f, -0.61f, 0.17f), XMFLOAT3(-0.32f, 0.38f, 0.0f) },
-    { XMFLOAT3(0.05f, -0.61f, -0.13f), XMFLOAT3(-0.32f, 0.38f, 0.0f) },
-    { XMFLOAT3(0.46f, -0.26f, -0.13f), XMFLOAT3(-0.32f, 0.38f, 0.0f) },
-
-    { XMFLOAT3(0.05f, -0.61f, 0.17f), XMFLOAT3(-0.32f, 0.38f, 0.0f) },
-    { XMFLOAT3(0.46f, -0.26f, -0.13f), XMFLOAT3(-0.32f, 0.38f, 0.0f) },
-    { XMFLOAT3(0.46f, -0.26f, 0.17f), XMFLOAT3(-0.32f, 0.38f, 0.0f) },
-
-    { XMFLOAT3(0.05f, -0.81f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(0.05f, -0.61f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(0.46f, -0.26f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-
-    { XMFLOAT3(0.05f, -0.81f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(0.46f, -0.26f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-    { XMFLOAT3(0.66f, -0.26f, 0.17f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
-
-    { XMFLOAT3(0.05f, -0.81f, -0.13f), XMFLOAT3(0.33f, -0.37f, 0.0f) },
-    { XMFLOAT3(0.05f, -0.81f, 0.17f), XMFLOAT3(0.33f, -0.37f, 0.0f) },
-    { XMFLOAT3(0.66f, -0.26f, 0.17f), XMFLOAT3(0.33f, -0.37f, 0.0f) },
-
-    { XMFLOAT3(0.05f, -0.81f, -0.13f), XMFLOAT3(0.33f, -0.37f, 0.0f) },
-    { XMFLOAT3(0.66f, -0.26f, 0.17f), XMFLOAT3(0.33f, -0.37f, 0.0f) },
-    { XMFLOAT3(0.66f, -0.26f, -0.13f), XMFLOAT3(0.33f, -0.37f, 0.0f) },
+    { XMFLOAT3(-0.58f, 1.19f, -0.13f), XMFLOAT3(-0.5f, -0.0f, 0.0f) },
+    { XMFLOAT3(-0.58f, 1.54f, -0.13f), XMFLOAT3(-0.5f, -0.0f, 0.0f) },
+    { XMFLOAT3(-0.58f, 1.54f, 0.12f), XMFLOAT3(-0.5f, -0.0f, 0.0f) },
+
+    { XMFLOAT3(-0.58f, 1.19f, -0.13f), XMFLOAT3(-0.5f, 0.0f, -0.0f) },
+    { XMFLOAT3(-0.58f, 1.54f, 0.12f), XMFLOAT3(-0.5f, 0.0f, -0.0f) },
+    { XMFLOAT3(-0.58f, 1.19f, 0.12f), XMFLOAT3(-0.5f, 0.0f, -0.0f) },
+
+    { XMFLOAT3(-0.58f, 1.19f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(-0.58f, 1.54f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(-0.48f, 1.49f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+
+    { XMFLOAT3(-0.58f, 1.19f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(-0.48f, 1.49f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(-0.48f, 1.24f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+
+    { XMFLOAT3(-0.48f, 1.49f, 0.12f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
+    { XMFLOAT3(-0.48f, 1.49f, -0.13f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
+    { XMFLOAT3(0.56f, 1.49f, -0.13f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
+
+    { XMFLOAT3(-0.48f, 1.49f, 0.12f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
+    { XMFLOAT3(0.56f, 1.49f, -0.13f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
+    { XMFLOAT3(0.56f, 1.49f, 0.12f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
+
+    { XMFLOAT3(-0.48f, 1.24f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.48f, 1.49f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.58f, 1.54f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+
+    { XMFLOAT3(-0.48f, 1.24f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.58f, 1.54f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.58f, 1.19f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+
+    { XMFLOAT3(-0.58f, 1.19f, 0.12f), XMFLOAT3(0.22f, -0.45f, 0.0f) },
+    { XMFLOAT3(-0.48f, 1.24f, 0.12f), XMFLOAT3(0.22f, -0.45f, 0.0f) },
+    { XMFLOAT3(-0.48f, 1.24f, -0.13f), XMFLOAT3(0.22f, -0.45f, 0.0f) },
+
+    { XMFLOAT3(-0.58f, 1.19f, 0.12f), XMFLOAT3(0.22f, -0.45f, 0.0f) },
+    { XMFLOAT3(-0.48f, 1.24f, -0.13f), XMFLOAT3(0.22f, -0.45f, 0.0f) },
+    { XMFLOAT3(-0.58f, 1.19f, -0.13f), XMFLOAT3(0.22f, -0.45f, 0.0f) },
+
+    { XMFLOAT3(-0.48f, 1.49f, 0.12f), XMFLOAT3(0.22f, 0.45f, 0.0f) },
+    { XMFLOAT3(-0.58f, 1.54f, 0.12f), XMFLOAT3(0.22f, 0.45f, 0.0f) },
+    { XMFLOAT3(-0.58f, 1.54f, -0.13f), XMFLOAT3(0.22f, 0.45f, 0.0f) },
+
+    { XMFLOAT3(-0.48f, 1.49f, 0.12f), XMFLOAT3(0.22f, 0.45f, -0.0f) },
+    { XMFLOAT3(-0.58f, 1.54f, -0.13f), XMFLOAT3(0.22f, 0.45f, -0.0f) },
+    { XMFLOAT3(-0.48f, 1.49f, -0.13f), XMFLOAT3(0.22f, 0.45f, -0.0f) },
+
+    { XMFLOAT3(0.56f, 1.49f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.56f, 1.24f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.81f, 1.24f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+
+    { XMFLOAT3(0.56f, 1.49f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.81f, 1.24f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.81f, 1.49f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+
+    { XMFLOAT3(-0.48f, 1.24f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(-0.48f, 1.49f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.56f, 1.49f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+
+    { XMFLOAT3(-0.48f, 1.24f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.56f, 1.49f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.56f, 1.24f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+
+    { XMFLOAT3(-0.48f, 1.49f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.48f, 1.24f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.56f, 1.24f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+
+    { XMFLOAT3(-0.48f, 1.49f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.56f, 1.24f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.56f, 1.49f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+
+    { XMFLOAT3(-0.48f, 1.24f, -0.13f), XMFLOAT3(0.0f, -0.5f, -0.0f) },
+    { XMFLOAT3(-0.48f, 1.24f, 0.12f), XMFLOAT3(0.0f, -0.5f, -0.0f) },
+    { XMFLOAT3(0.56f, 1.24f, 0.12f), XMFLOAT3(0.0f, -0.5f, -0.0f) },
+
+    { XMFLOAT3(-0.48f, 1.24f, -0.13f), XMFLOAT3(-0.0f, -0.5f, 0.0f) },
+    { XMFLOAT3(0.56f, 1.24f, 0.12f), XMFLOAT3(-0.0f, -0.5f, 0.0f) },
+    { XMFLOAT3(0.56f, 1.24f, -0.13f), XMFLOAT3(-0.0f, -0.5f, 0.0f) },
+
+    { XMFLOAT3(0.81f, 1.24f, 0.12f), XMFLOAT3(0.5f, 0.0f, 0.0f) },
+    { XMFLOAT3(0.81f, 1.49f, 0.12f), XMFLOAT3(0.5f, 0.0f, 0.0f) },
+    { XMFLOAT3(0.81f, 1.49f, -0.13f), XMFLOAT3(0.5f, 0.0f, 0.0f) },
+
+    { XMFLOAT3(0.81f, 1.24f, 0.12f), XMFLOAT3(0.5f, 0.0f, -0.0f) },
+    { XMFLOAT3(0.81f, 1.49f, -0.13f), XMFLOAT3(0.5f, 0.0f, -0.0f) },
+    { XMFLOAT3(0.81f, 1.24f, -0.13f), XMFLOAT3(0.5f, 0.0f, -0.0f) },
+
+    { XMFLOAT3(0.81f, 1.24f, 0.12f), XMFLOAT3(0.41f, -0.29f, 0.0f) },
+    { XMFLOAT3(0.81f, 1.24f, -0.13f), XMFLOAT3(0.41f, -0.29f, 0.0f) },
+    { XMFLOAT3(0.01f, 0.09f, -0.13f), XMFLOAT3(0.41f, -0.29f, 0.0f) },
+
+    { XMFLOAT3(0.81f, 1.24f, 0.12f), XMFLOAT3(0.41f, -0.29f, 0.0f) },
+    { XMFLOAT3(0.01f, 0.09f, -0.13f), XMFLOAT3(0.41f, -0.29f, 0.0f) },
+    { XMFLOAT3(0.01f, 0.09f, 0.12f), XMFLOAT3(0.41f, -0.29f, 0.0f) },
+
+    { XMFLOAT3(0.56f, 1.49f, 0.12f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
+    { XMFLOAT3(0.56f, 1.49f, -0.13f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
+    { XMFLOAT3(0.81f, 1.49f, -0.13f), XMFLOAT3(0.0f, 0.5f, -0.0f) },
+
+    { XMFLOAT3(0.56f, 1.49f, 0.12f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
+    { XMFLOAT3(0.81f, 1.49f, -0.13f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
+    { XMFLOAT3(0.81f, 1.49f, 0.12f), XMFLOAT3(0.0f, 0.5f, 0.0f) },
+
+    { XMFLOAT3(0.56f, 1.24f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.56f, 1.49f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.81f, 1.49f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+
+    { XMFLOAT3(0.56f, 1.24f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.81f, 1.49f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.81f, 1.24f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+
+    { XMFLOAT3(-0.24f, 0.09f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.01f, 0.09f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.11f, 0.0f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+
+    { XMFLOAT3(-0.24f, 0.09f, 0.12f), XMFLOAT3(0.0f, -0.0f, 0.5f) },
+    { XMFLOAT3(0.11f, 0.0f, 0.12f), XMFLOAT3(0.0f, -0.0f, 0.5f) },
+    { XMFLOAT3(-0.34f, 0.0f, 0.12f), XMFLOAT3(0.0f, -0.0f, 0.5f) },
+
+    { XMFLOAT3(0.56f, 1.24f, 0.12f), XMFLOAT3(0.0f, -0.0f, 0.5f) },
+    { XMFLOAT3(0.81f, 1.24f, 0.12f), XMFLOAT3(0.0f, -0.0f, 0.5f) },
+    { XMFLOAT3(0.01f, 0.09f, 0.12f), XMFLOAT3(0.0f, -0.0f, 0.5f) },
+
+    { XMFLOAT3(0.56f, 1.24f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(0.01f, 0.09f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+    { XMFLOAT3(-0.24f, 0.09f, 0.12f), XMFLOAT3(0.0f, 0.0f, 0.5f) },
+
+    { XMFLOAT3(0.56f, 1.24f, -0.13f), XMFLOAT3(-0.41f, 0.29f, 0.0f) },
+    { XMFLOAT3(0.56f, 1.24f, 0.12f), XMFLOAT3(-0.41f, 0.29f, 0.0f) },
+    { XMFLOAT3(-0.24f, 0.09f, 0.12f), XMFLOAT3(-0.41f, 0.29f, 0.0f) },
+
+    { XMFLOAT3(0.56f, 1.24f, -0.13f), XMFLOAT3(-0.41f, 0.29f, 0.0f) },
+    { XMFLOAT3(-0.24f, 0.09f, 0.12f), XMFLOAT3(-0.41f, 0.29f, 0.0f) },
+    { XMFLOAT3(-0.24f, 0.09f, -0.13f), XMFLOAT3(-0.41f, 0.29f, 0.0f) },
+
+    { XMFLOAT3(0.81f, 1.24f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.56f, 1.24f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.24f, 0.09f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+
+    { XMFLOAT3(0.81f, 1.24f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.24f, 0.09f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.01f, 0.09f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+
+    { XMFLOAT3(-0.34f, 0.0f, -0.13f), XMFLOAT3(0.0f, -0.5f, -0.0f) },
+    { XMFLOAT3(-0.34f, 0.0f, 0.12f), XMFLOAT3(0.0f, -0.5f, -0.0f) },
+    { XMFLOAT3(0.11f, 0.0f, 0.12f), XMFLOAT3(0.0f, -0.5f, -0.0f) },
+
+    { XMFLOAT3(-0.34f, 0.0f, -0.13f), XMFLOAT3(-0.0f, -0.5f, 0.0f) },
+    { XMFLOAT3(0.11f, 0.0f, 0.12f), XMFLOAT3(-0.0f, -0.5f, 0.0f) },
+    { XMFLOAT3(0.11f, 0.0f, -0.13f), XMFLOAT3(-0.0f, -0.5f, 0.0f) },
+
+    { XMFLOAT3(0.01f, 0.09f, 0.12f), XMFLOAT3(0.33f, 0.38f, -0.0f) },
+    { XMFLOAT3(0.01f, 0.09f, -0.13f), XMFLOAT3(0.33f, 0.38f, -0.0f) },
+    { XMFLOAT3(0.11f, 0.0f, -0.13f), XMFLOAT3(0.33f, 0.38f, -0.0f) },
+
+    { XMFLOAT3(0.01f, 0.09f, 0.12f), XMFLOAT3(0.33f, 0.38f, 0.0f) },
+    { XMFLOAT3(0.11f, 0.0f, -0.13f), XMFLOAT3(0.33f, 0.38f, 0.0f) },
+    { XMFLOAT3(0.11f, 0.0f, 0.12f), XMFLOAT3(0.33f, 0.38f, 0.0f) },
+
+    { XMFLOAT3(0.01f, 0.09f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.24f, 0.09f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.34f, 0.0f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+
+    { XMFLOAT3(0.01f, 0.09f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(-0.34f, 0.0f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+    { XMFLOAT3(0.11f, 0.0f, -0.13f), XMFLOAT3(0.0f, 0.0f, -0.5f) },
+
+    { XMFLOAT3(-0.24f, 0.09f, -0.13f), XMFLOAT3(-0.33f, 0.38f, 0.0f) },
+    { XMFLOAT3(-0.24f, 0.09f, 0.12f), XMFLOAT3(-0.33f, 0.38f, 0.0f) },
+    { XMFLOAT3(-0.34f, 0.0f, 0.12f), XMFLOAT3(-0.33f, 0.38f, 0.0f) },
+
+    { XMFLOAT3(-0.24f, 0.09f, -0.13f), XMFLOAT3(-0.33f, 0.38f, 0.0f) },
+    { XMFLOAT3(-0.34f, 0.0f, 0.12f), XMFLOAT3(-0.33f, 0.38f, 0.0f) },
+    { XMFLOAT3(-0.34f, 0.0f, -0.13f), XMFLOAT3(-0.33f, 0.38f, 0.0f) },
 
     };
 
     WORD indices[] = {
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, };
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, };
 
-    g_nTriangles = 68;
-    g_nVertices = 204;
+    g_nTriangles = 44;
+    g_nVertices = 132;
 
-    /*
-    for (int i = 0; i < g_nVertices; i++)
-    {
-        //vertices[i].Pos.x += vertices[i].Pos.x * vertices[i].Pos.y;
-        vertices[i].Pos.z += vertices[i].Pos.z * vertices[i].Pos.y;
-    }
-    */
+
     HRESULT hr = S_OK;
 
     RECT rc;
-    GetClientRect( g_hWnd, &rc );
+    GetClientRect(g_hWnd, &rc);
     UINT width = rc.right - rc.left;
     UINT height = rc.bottom - rc.top;
 
@@ -502,7 +404,7 @@ HRESULT InitDevice()
         D3D_DRIVER_TYPE_WARP,
         D3D_DRIVER_TYPE_REFERENCE,
     };
-    UINT numDriverTypes = ARRAYSIZE( driverTypes );
+    UINT numDriverTypes = ARRAYSIZE(driverTypes);
 
     D3D_FEATURE_LEVEL featureLevels[] =
     {
@@ -511,39 +413,39 @@ HRESULT InitDevice()
         D3D_FEATURE_LEVEL_10_1,
         D3D_FEATURE_LEVEL_10_0,
     };
-	UINT numFeatureLevels = ARRAYSIZE( featureLevels );
+    UINT numFeatureLevels = ARRAYSIZE(featureLevels);
 
-    for( UINT driverTypeIndex = 0; driverTypeIndex < numDriverTypes; driverTypeIndex++ )
+    for (UINT driverTypeIndex = 0; driverTypeIndex < numDriverTypes; driverTypeIndex++)
     {
         g_driverType = driverTypes[driverTypeIndex];
-        hr = D3D11CreateDevice( nullptr, g_driverType, nullptr, createDeviceFlags, featureLevels, numFeatureLevels,
-                                D3D11_SDK_VERSION, &g_pd3dDevice, &g_featureLevel, &g_pImmediateContext );
+        hr = D3D11CreateDevice(nullptr, g_driverType, nullptr, createDeviceFlags, featureLevels, numFeatureLevels,
+            D3D11_SDK_VERSION, &g_pd3dDevice, &g_featureLevel, &g_pImmediateContext);
 
-        if ( hr == E_INVALIDARG )
+        if (hr == E_INVALIDARG)
         {
             // DirectX 11.0 platforms will not recognize D3D_FEATURE_LEVEL_11_1 so we need to retry without it
-            hr = D3D11CreateDevice( nullptr, g_driverType, nullptr, createDeviceFlags, &featureLevels[1], numFeatureLevels - 1,
-                                    D3D11_SDK_VERSION, &g_pd3dDevice, &g_featureLevel, &g_pImmediateContext );
+            hr = D3D11CreateDevice(nullptr, g_driverType, nullptr, createDeviceFlags, &featureLevels[1], numFeatureLevels - 1,
+                D3D11_SDK_VERSION, &g_pd3dDevice, &g_featureLevel, &g_pImmediateContext);
         }
 
-        if( SUCCEEDED( hr ) )
+        if (SUCCEEDED(hr))
             break;
     }
-    if( FAILED( hr ) )
+    if (FAILED(hr))
         return hr;
 
     // Obtain DXGI factory from device (since we used nullptr for pAdapter above)
     IDXGIFactory1* dxgiFactory = nullptr;
     {
         IDXGIDevice* dxgiDevice = nullptr;
-        hr = g_pd3dDevice->QueryInterface( __uuidof(IDXGIDevice), reinterpret_cast<void**>(&dxgiDevice) );
+        hr = g_pd3dDevice->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(&dxgiDevice));
         if (SUCCEEDED(hr))
         {
             IDXGIAdapter* adapter = nullptr;
             hr = dxgiDevice->GetAdapter(&adapter);
             if (SUCCEEDED(hr))
             {
-                hr = adapter->GetParent( __uuidof(IDXGIFactory1), reinterpret_cast<void**>(&dxgiFactory) );
+                hr = adapter->GetParent(__uuidof(IDXGIFactory1), reinterpret_cast<void**>(&dxgiFactory));
                 adapter->Release();
             }
             dxgiDevice->Release();
@@ -554,14 +456,14 @@ HRESULT InitDevice()
 
     // Create swap chain
     IDXGIFactory2* dxgiFactory2 = nullptr;
-    hr = dxgiFactory->QueryInterface( __uuidof(IDXGIFactory2), reinterpret_cast<void**>(&dxgiFactory2) );
-    if ( dxgiFactory2 )
+    hr = dxgiFactory->QueryInterface(__uuidof(IDXGIFactory2), reinterpret_cast<void**>(&dxgiFactory2));
+    if (dxgiFactory2)
     {
         // DirectX 11.1 or later
-        hr = g_pd3dDevice->QueryInterface( __uuidof(ID3D11Device1), reinterpret_cast<void**>(&g_pd3dDevice1) );
+        hr = g_pd3dDevice->QueryInterface(__uuidof(ID3D11Device1), reinterpret_cast<void**>(&g_pd3dDevice1));
         if (SUCCEEDED(hr))
         {
-            (void) g_pImmediateContext->QueryInterface( __uuidof(ID3D11DeviceContext1), reinterpret_cast<void**>(&g_pImmediateContext1) );
+            (void)g_pImmediateContext->QueryInterface(__uuidof(ID3D11DeviceContext1), reinterpret_cast<void**>(&g_pImmediateContext1));
         }
 
         DXGI_SWAP_CHAIN_DESC1 sd;
@@ -574,10 +476,10 @@ HRESULT InitDevice()
         sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         sd.BufferCount = 1;
 
-        hr = dxgiFactory2->CreateSwapChainForHwnd( g_pd3dDevice, g_hWnd, &sd, nullptr, nullptr, &g_pSwapChain1 );
+        hr = dxgiFactory2->CreateSwapChainForHwnd(g_pd3dDevice, g_hWnd, &sd, nullptr, nullptr, &g_pSwapChain1);
         if (SUCCEEDED(hr))
         {
-            hr = g_pSwapChain1->QueryInterface( __uuidof(IDXGISwapChain), reinterpret_cast<void**>(&g_pSwapChain) );
+            hr = g_pSwapChain1->QueryInterface(__uuidof(IDXGISwapChain), reinterpret_cast<void**>(&g_pSwapChain));
         }
 
         dxgiFactory2->Release();
@@ -599,11 +501,11 @@ HRESULT InitDevice()
         sd.SampleDesc.Quality = 0;
         sd.Windowed = TRUE;
 
-        hr = dxgiFactory->CreateSwapChain( g_pd3dDevice, &sd, &g_pSwapChain );
+        hr = dxgiFactory->CreateSwapChain(g_pd3dDevice, &sd, &g_pSwapChain);
     }
 
     // Note this program doesn't handle full-screen swapchains so we block the ALT+ENTER shortcut
-    dxgiFactory->MakeWindowAssociation( g_hWnd, DXGI_MWA_NO_ALT_ENTER );
+    dxgiFactory->MakeWindowAssociation(g_hWnd, DXGI_MWA_NO_ALT_ENTER);
 
     dxgiFactory->Release();
 
@@ -612,18 +514,18 @@ HRESULT InitDevice()
 
     // Create a render target view
     ID3D11Texture2D* pBackBuffer = nullptr;
-    hr = g_pSwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), reinterpret_cast<void**>( &pBackBuffer ) );
-    if( FAILED( hr ) )
+    hr = g_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&pBackBuffer));
+    if (FAILED(hr))
         return hr;
 
-    hr = g_pd3dDevice->CreateRenderTargetView( pBackBuffer, nullptr, &g_pRenderTargetView );
+    hr = g_pd3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &g_pRenderTargetView);
     pBackBuffer->Release();
-    if( FAILED( hr ) )
+    if (FAILED(hr))
         return hr;
 
     // Create depth stencil texture
     D3D11_TEXTURE2D_DESC descDepth;
-	ZeroMemory( &descDepth, sizeof(descDepth) );
+    ZeroMemory(&descDepth, sizeof(descDepth));
     descDepth.Width = width;
     descDepth.Height = height;
     descDepth.MipLevels = 1;
@@ -635,41 +537,41 @@ HRESULT InitDevice()
     descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     descDepth.CPUAccessFlags = 0;
     descDepth.MiscFlags = 0;
-    hr = g_pd3dDevice->CreateTexture2D( &descDepth, nullptr, &g_pDepthStencil );
-    if( FAILED( hr ) )
+    hr = g_pd3dDevice->CreateTexture2D(&descDepth, nullptr, &g_pDepthStencil);
+    if (FAILED(hr))
         return hr;
 
     // Create the depth stencil view
     D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
-	ZeroMemory( &descDSV, sizeof(descDSV) );
+    ZeroMemory(&descDSV, sizeof(descDSV));
     descDSV.Format = descDepth.Format;
     descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
     descDSV.Texture2D.MipSlice = 0;
-    hr = g_pd3dDevice->CreateDepthStencilView( g_pDepthStencil, &descDSV, &g_pDepthStencilView );
-    if( FAILED( hr ) )
+    hr = g_pd3dDevice->CreateDepthStencilView(g_pDepthStencil, &descDSV, &g_pDepthStencilView);
+    if (FAILED(hr))
         return hr;
 
-    g_pImmediateContext->OMSetRenderTargets( 1, &g_pRenderTargetView, g_pDepthStencilView );
+    g_pImmediateContext->OMSetRenderTargets(1, &g_pRenderTargetView, g_pDepthStencilView);
 
-	D3D11_RASTERIZER_DESC rasterDesc;
-	rasterDesc.AntialiasedLineEnable = false;
-	rasterDesc.CullMode = D3D11_CULL_NONE;
-	rasterDesc.DepthBias = 0;
-	rasterDesc.DepthBiasClamp = 0.0f;
-	rasterDesc.DepthClipEnable = true;
-	rasterDesc.FillMode = D3D11_FILL_SOLID;
-	rasterDesc.FrontCounterClockwise = true;
-	rasterDesc.MultisampleEnable = false;
-	rasterDesc.ScissorEnable = false;
-	rasterDesc.SlopeScaledDepthBias = 0.0f;
+    D3D11_RASTERIZER_DESC rasterDesc;
+    rasterDesc.AntialiasedLineEnable = false;
+    rasterDesc.CullMode = D3D11_CULL_NONE;
+    rasterDesc.DepthBias = 0;
+    rasterDesc.DepthBiasClamp = 0.0f;
+    rasterDesc.DepthClipEnable = true;
+    rasterDesc.FillMode = D3D11_FILL_SOLID;
+    rasterDesc.FrontCounterClockwise = true;
+    rasterDesc.MultisampleEnable = false;
+    rasterDesc.ScissorEnable = false;
+    rasterDesc.SlopeScaledDepthBias = 0.0f;
 
-	hr = g_pd3dDevice->CreateRasterizerState(&rasterDesc, &g_rasterState);
-	if (FAILED(hr)) 
-		return hr;
-	
-	g_pImmediateContext->RSSetState(g_rasterState);
+    hr = g_pd3dDevice->CreateRasterizerState(&rasterDesc, &g_rasterState);
+    if (FAILED(hr))
+        return hr;
 
-	// Setup the viewport
+    g_pImmediateContext->RSSetState(g_rasterState);
+
+    // Setup the viewport
     D3D11_VIEWPORT vp;
     vp.Width = (FLOAT)width;
     vp.Height = (FLOAT)height;
@@ -677,125 +579,125 @@ HRESULT InitDevice()
     vp.MaxDepth = 1.0f;
     vp.TopLeftX = 0;
     vp.TopLeftY = 0;
-    g_pImmediateContext->RSSetViewports( 1, &vp );
+    g_pImmediateContext->RSSetViewports(1, &vp);
 
-	// Compile the vertex shader
-	ID3DBlob* pVSBlob = nullptr;
-    hr = CompileShaderFromFile( L"Shaders.fx", "VS", "vs_4_0", &pVSBlob );
-    if( FAILED( hr ) )
+    // Compile the vertex shader
+    ID3DBlob* pVSBlob = nullptr;
+    hr = CompileShaderFromFile(L"Shaders.fx", "VS", "vs_4_0", &pVSBlob);
+    if (FAILED(hr))
     {
-        MessageBox( nullptr,
-                    L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK );
+        MessageBox(nullptr,
+            L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK);
         return hr;
     }
 
-	// Create the vertex shader
-	hr = g_pd3dDevice->CreateVertexShader( pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), nullptr, &g_pVertexShader );
-	if( FAILED( hr ) )
-	{	
-		pVSBlob->Release();
+    // Create the vertex shader
+    hr = g_pd3dDevice->CreateVertexShader(pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), nullptr, &g_pVertexShader);
+    if (FAILED(hr))
+    {
+        pVSBlob->Release();
         return hr;
-	}
+    }
 
     // Define the input layout
     D3D11_INPUT_ELEMENT_DESC layout[] =
     {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
-	UINT numElements = ARRAYSIZE( layout );
+    };
+    UINT numElements = ARRAYSIZE(layout);
 
     // Create the input layout
-	hr = g_pd3dDevice->CreateInputLayout( layout, numElements, pVSBlob->GetBufferPointer(),
-                                          pVSBlob->GetBufferSize(), &g_pVertexLayout );
-	pVSBlob->Release();
-	if( FAILED( hr ) )
+    hr = g_pd3dDevice->CreateInputLayout(layout, numElements, pVSBlob->GetBufferPointer(),
+        pVSBlob->GetBufferSize(), &g_pVertexLayout);
+    pVSBlob->Release();
+    if (FAILED(hr))
         return hr;
 
     // Set the input layout
-    g_pImmediateContext->IASetInputLayout( g_pVertexLayout );
+    g_pImmediateContext->IASetInputLayout(g_pVertexLayout);
 
-	// Compile the pixel shader
-	ID3DBlob* pPSBlob = nullptr;
-    hr = CompileShaderFromFile( L"Shaders.fx", "PS", "ps_4_0", &pPSBlob );
-    if( FAILED( hr ) )
+    // Compile the pixel shader
+    ID3DBlob* pPSBlob = nullptr;
+    hr = CompileShaderFromFile(L"Shaders.fx", "PS", "ps_4_0", &pPSBlob);
+    if (FAILED(hr))
     {
-        MessageBox( nullptr,
-                    L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK );
+        MessageBox(nullptr,
+            L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK);
         return hr;
     }
 
-	// Create the pixel shader
-	hr = g_pd3dDevice->CreatePixelShader( pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), nullptr, &g_pPixelShader );
-	pPSBlob->Release();
-    if( FAILED( hr ) )
+    // Create the pixel shader
+    hr = g_pd3dDevice->CreatePixelShader(pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), nullptr, &g_pPixelShader);
+    pPSBlob->Release();
+    if (FAILED(hr))
         return hr;
 
-	// Compile the pixel shader
-	pPSBlob = nullptr;
-	hr = CompileShaderFromFile( L"Shaders.fx", "PSSolid", "ps_4_0", &pPSBlob );
-    if( FAILED( hr ) )
+    // Compile the pixel shader
+    pPSBlob = nullptr;
+    hr = CompileShaderFromFile(L"Shaders.fx", "PSSolid", "ps_4_0", &pPSBlob);
+    if (FAILED(hr))
     {
-        MessageBox( nullptr,
-                    L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK );
+        MessageBox(nullptr,
+            L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK);
         return hr;
     }
 
-	// Create the pixel shader
-	hr = g_pd3dDevice->CreatePixelShader( pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), nullptr, &g_pPixelShaderSolid );
-	pPSBlob->Release();
-    if( FAILED( hr ) )
+    // Create the pixel shader
+    hr = g_pd3dDevice->CreatePixelShader(pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), nullptr, &g_pPixelShaderSolid);
+    pPSBlob->Release();
+    if (FAILED(hr))
         return hr;
 
     D3D11_BUFFER_DESC bd;
-	ZeroMemory( &bd, sizeof(bd) );
+    ZeroMemory(&bd, sizeof(bd));
     bd.Usage = D3D11_USAGE_DEFAULT;
     //bd.ByteWidth = sizeof( SimpleVertex ) * 24;
-	bd.ByteWidth = sizeof(SimpleVertex) * g_nVertices;
+    bd.ByteWidth = sizeof(SimpleVertex) * g_nVertices;
 
     bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bd.CPUAccessFlags = 0;
+    bd.CPUAccessFlags = 0;
     D3D11_SUBRESOURCE_DATA InitData;
-	ZeroMemory( &InitData, sizeof(InitData) );
+    ZeroMemory(&InitData, sizeof(InitData));
     InitData.pSysMem = vertices;
-    hr = g_pd3dDevice->CreateBuffer( &bd, &InitData, &g_pVertexBuffer );
-    if( FAILED( hr ) )
+    hr = g_pd3dDevice->CreateBuffer(&bd, &InitData, &g_pVertexBuffer);
+    if (FAILED(hr))
         return hr;
 
     // Set vertex buffer
-    UINT stride = sizeof( SimpleVertex );
+    UINT stride = sizeof(SimpleVertex);
     UINT offset = 0;
-    g_pImmediateContext->IASetVertexBuffers( 0, 1, &g_pVertexBuffer, &stride, &offset );
+    g_pImmediateContext->IASetVertexBuffers(0, 1, &g_pVertexBuffer, &stride, &offset);
 
     bd.Usage = D3D11_USAGE_DEFAULT;
-   	bd.ByteWidth = sizeof(WORD) * 3*g_nTriangles;
+    bd.ByteWidth = sizeof(WORD) * 3 * g_nTriangles;
     bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	bd.CPUAccessFlags = 0;
+    bd.CPUAccessFlags = 0;
     InitData.pSysMem = indices;
-    hr = g_pd3dDevice->CreateBuffer( &bd, &InitData, &g_pIndexBuffer );
-    if( FAILED( hr ) )
+    hr = g_pd3dDevice->CreateBuffer(&bd, &InitData, &g_pIndexBuffer);
+    if (FAILED(hr))
         return hr;
 
     // Set index buffer
-    g_pImmediateContext->IASetIndexBuffer( g_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0 );
+    g_pImmediateContext->IASetIndexBuffer(g_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
     // Set primitive topology
-    g_pImmediateContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+    g_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// Create the constant buffer
-	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(ConstantBuffer);
-	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	bd.CPUAccessFlags = 0;
-    hr = g_pd3dDevice->CreateBuffer( &bd, nullptr, &g_pConstantBuffer );
-    if( FAILED( hr ) )
+    // Create the constant buffer
+    bd.Usage = D3D11_USAGE_DEFAULT;
+    bd.ByteWidth = sizeof(ConstantBuffer);
+    bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    bd.CPUAccessFlags = 0;
+    hr = g_pd3dDevice->CreateBuffer(&bd, nullptr, &g_pConstantBuffer);
+    if (FAILED(hr))
         return hr;
 
-   
-  
+
+
 
     // Initialize the projection matrix
-	g_Projection = XMMatrixPerspectiveFovRH( XM_PIDIV4, width / (FLOAT)height, 0.01f, 100.0f );
+    g_Projection = XMMatrixPerspectiveFovRH(XM_PIDIV4, width / (FLOAT)height, 0.01f, 100.0f);
 
     return S_OK;
 }
@@ -806,78 +708,95 @@ HRESULT InitDevice()
 //--------------------------------------------------------------------------------------
 void CleanupDevice()
 {
-    if( g_pImmediateContext ) g_pImmediateContext->ClearState();
+    if (g_pImmediateContext) g_pImmediateContext->ClearState();
 
-    if( g_pConstantBuffer ) g_pConstantBuffer->Release();
-    if( g_pVertexBuffer ) g_pVertexBuffer->Release();
-    if( g_pIndexBuffer ) g_pIndexBuffer->Release();
-    if( g_pVertexLayout ) g_pVertexLayout->Release();
-    if( g_pVertexShader ) g_pVertexShader->Release();
-    if( g_pPixelShaderSolid ) g_pPixelShaderSolid->Release();
-    if( g_pPixelShader ) g_pPixelShader->Release();
-    if( g_pDepthStencil ) g_pDepthStencil->Release();
-    if( g_pDepthStencilView ) g_pDepthStencilView->Release();
-    if( g_pRenderTargetView ) g_pRenderTargetView->Release();
-    if( g_pSwapChain1 ) g_pSwapChain1->Release();
-    if( g_pSwapChain ) g_pSwapChain->Release();
-    if( g_pImmediateContext1 ) g_pImmediateContext1->Release();
-    if( g_pImmediateContext ) g_pImmediateContext->Release();
-    if( g_pd3dDevice1 ) g_pd3dDevice1->Release();
-    if( g_pd3dDevice ) g_pd3dDevice->Release();
+    if (g_pConstantBuffer) g_pConstantBuffer->Release();
+    if (g_pVertexBuffer) g_pVertexBuffer->Release();
+    if (g_pIndexBuffer) g_pIndexBuffer->Release();
+    if (g_pVertexLayout) g_pVertexLayout->Release();
+    if (g_pVertexShader) g_pVertexShader->Release();
+    if (g_pPixelShaderSolid) g_pPixelShaderSolid->Release();
+    if (g_pPixelShader) g_pPixelShader->Release();
+    if (g_pDepthStencil) g_pDepthStencil->Release();
+    if (g_pDepthStencilView) g_pDepthStencilView->Release();
+    if (g_pRenderTargetView) g_pRenderTargetView->Release();
+    if (g_pSwapChain1) g_pSwapChain1->Release();
+    if (g_pSwapChain) g_pSwapChain->Release();
+    if (g_pImmediateContext1) g_pImmediateContext1->Release();
+    if (g_pImmediateContext) g_pImmediateContext->Release();
+    if (g_pd3dDevice1) g_pd3dDevice1->Release();
+    if (g_pd3dDevice) g_pd3dDevice->Release();
 }
 
 
 //--------------------------------------------------------------------------------------
 // Called every time the application receives a message
 //--------------------------------------------------------------------------------------
-LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     PAINTSTRUCT ps;
     HDC hdc;
-	static int x, y;
+    static int x, y;
 
-    switch( message )
+    switch (message)
     {
     case WM_PAINT:
-        hdc = BeginPaint( hWnd, &ps );
-        EndPaint( hWnd, &ps );
+        hdc = BeginPaint(hWnd, &ps);
+        EndPaint(hWnd, &ps);
         break;
 
-	case WM_LBUTTONDOWN: //reakcja na lewy przycisk myszki
-	{
-		x = LOWORD(lParam);
-		y = HIWORD(lParam);
-		break;
-	}
+    case WM_LBUTTONDOWN: //reakcja na lewy przycisk myszki
+    {
+        x = LOWORD(lParam);
+        y = HIWORD(lParam);
+        break;
+    }
     case WM_KEYDOWN: {
         switch (wParam)
         {
         case VK_UP:
-            if (scale > 0)
-            scale -= 0.1;
+            angleX -= 0.1;
             break;
         case VK_DOWN:
-            scale += 0.1;
+            angleX += 0.1;
             break;
         case VK_LEFT:
-            angle -= 0.1;
+            angleY -= 0.1;
             break;
         case VK_RIGHT:
-            angle += 0.1;
+            angleY += 0.1;
+            break;
+        case 'W':
+            posY += 0.1;
+            break;
+        case 'S':
+            posY -= 0.1;
+            break;
+        case 'A':
+            posX -= 0.1;
+            break;
+        case 'D':
+            posX += 0.1;
+            break;
+        case 'Q':
+            posZ -= 0.1;
+            break;
+        case 'E':
+            posZ += 0.1;
             break;
         }
         break;
     }
 
     case WM_DESTROY:
-        PostQuitMessage( 0 );
+        PostQuitMessage(0);
         break;
 
         // Note that this program does not handle resizing (WM_SIZE) requests,
         // so we created the window without the resize border.
 
     default:
-        return DefWindowProc( hWnd, message, wParam, lParam );
+        return DefWindowProc(hWnd, message, wParam, lParam);
     }
 
     return 0;
@@ -889,77 +808,79 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 //--------------------------------------------------------------------------------------
 void Render()
 {
-	// Initialize the world matrices
-	g_World = XMMatrixIdentity();
+    // Initialize the world matrices
+    g_World = XMMatrixIdentity();
     g_World2 = XMMatrixIdentity();
 
-	// Initialize the view matrix
-	XMVECTOR Eye = XMVectorSet(5*cos(angle), 1.0f, 5*sin(angle), 0.0f);
-	XMVECTOR At = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-	XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	g_View = XMMatrixLookAtRH( scale * Eye, At, Up);
+    // Initialize the view matrix
+    XMVECTOR Eye = XMVectorSet(0.0f + posX, 2.0f + posY, 4.0f + posZ, 0.0f);
+    XMVECTOR At = XMVectorSet(0.0f + posX, 0.0f + posY, 0.0f + posZ, 0.0f);
+    XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+    g_View = XMMatrixLookAtRH(Eye,  At, Up);
+    g_View *= XMMatrixRotationY(angleY);
+    g_View *= XMMatrixRotationX(angleX);
 
     // Update our time
     static float t = 0.0f;
-    if( g_driverType == D3D_DRIVER_TYPE_REFERENCE )
+    if (g_driverType == D3D_DRIVER_TYPE_REFERENCE)
     {
-        t += ( float )XM_PI * 0.0125f;
+        t += (float)XM_PI * 0.0125f;
     }
     else
     {
         static ULONGLONG timeStart = 0;
         ULONGLONG timeCur = GetTickCount64();
-        if( timeStart == 0 )
+        if (timeStart == 0)
             timeStart = timeCur;
-        t = ( timeCur - timeStart ) / 2000.0f;
+        t = (timeCur - timeStart) / 2000.0f;
     }
 
 
     // Rotate around the origin
-	g_World = XMMatrixRotationY( t );
+   
+    g_World2 *= XMMatrixScaling(0.5, 0.5, 0.5) * XMMatrixRotationY(3.14159) * XMMatrixTranslation(1.25, 0.0, 0.0);
 
-    g_World2 *=  XMMatrixScaling(0.75, 0.75, 0.75);
+    float temp_scale = 0.5*(sin(t) - 1);
 
-    float temp_scale = sin(t) * cos(t) + 1.75;
+    g_World *= XMMatrixTranslation(0.0f, temp_scale, 0.0f);
 
-    g_World *= XMMatrixScaling(temp_scale, temp_scale, temp_scale);
-	
+    g_World2 *= XMMatrixTranslation(0.0f, -temp_scale - 1, 0.0f);
 
     // Setup our lighting parameters
-	XMFLOAT4 vLightDirs = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
-	XMFLOAT4 vLightColors = XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f);
-    XMFLOAT4 vLightColors2 = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-    
-	//
+    XMFLOAT4 vLightDirs = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+    XMFLOAT4 vLightColors = XMFLOAT4(4.0, 0.5f, 0.0f, 1.0f);
+    XMFLOAT4 vLightColors2 = XMFLOAT4(4.0f, 0.0f, 4.0f, 1.0f);
+
+    //
     // Clear the back buffer
     //
 
-    g_pImmediateContext->ClearRenderTargetView( g_pRenderTargetView, Colors::MidnightBlue );
+    g_pImmediateContext->ClearRenderTargetView(g_pRenderTargetView, Colors::MidnightBlue);
 
     //
     // Clear the depth buffer to 1.0 (max depth)
     //
-    g_pImmediateContext->ClearDepthStencilView( g_pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0 );
+    g_pImmediateContext->ClearDepthStencilView(g_pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
     //
     // Update matrix variables and lighting variables
     //
     ConstantBuffer cb1;
-	cb1.mWorld = XMMatrixTranspose( g_World );
-	cb1.mView = XMMatrixTranspose( g_View );
-	cb1.mProjection = XMMatrixTranspose( g_Projection );
-	cb1.vLightDir = vLightDirs;
-	cb1.vLightColor = vLightColors;
-	cb1.vOutputColor = XMFLOAT4(0, 0, 0, 0);
-	g_pImmediateContext->UpdateSubresource( g_pConstantBuffer, 0, nullptr, &cb1, 0, 0 );
+    cb1.mWorld = XMMatrixTranspose(g_World);
+    cb1.mView = XMMatrixTranspose(g_View);
+    cb1.mProjection = XMMatrixTranspose(g_Projection);
+    cb1.vLightDir = vLightDirs;
+    cb1.vLightColor = vLightColors;
+    cb1.vOutputColor = XMFLOAT4(0, 0, 0, 0);
+    g_pImmediateContext->UpdateSubresource(g_pConstantBuffer, 0, nullptr, &cb1, 0, 0);
 
     //
     // Render     //
-	g_pImmediateContext->VSSetShader( g_pVertexShader, nullptr, 0 );
-	g_pImmediateContext->VSSetConstantBuffers( 0, 1, &g_pConstantBuffer );
-	g_pImmediateContext->PSSetShader( g_pPixelShader, nullptr, 0 );
-	g_pImmediateContext->PSSetConstantBuffers( 0, 1, &g_pConstantBuffer );
-	g_pImmediateContext->DrawIndexed(g_nTriangles*3, 0, 0 );
+    g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0);
+    g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pConstantBuffer);
+    g_pImmediateContext->PSSetShader(g_pPixelShader, nullptr, 0);
+    g_pImmediateContext->PSSetConstantBuffers(0, 1, &g_pConstantBuffer);
+    g_pImmediateContext->DrawIndexed(g_nTriangles * 3, 0, 0);
 
     //
     // Update matrix variables and lighting variables
@@ -985,7 +906,7 @@ void Render()
     //
     // Present our back buffer to our front buffer
     //
-    g_pSwapChain->Present( 0, 0 );
+    g_pSwapChain->Present(0, 0);
 }
 
 
