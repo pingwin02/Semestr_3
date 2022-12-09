@@ -56,10 +56,13 @@ ID3D11Buffer*           g_pIndexBuffer = nullptr;
 ID3D11Buffer*           g_pConstantBuffer = nullptr;
 ID3D11RasterizerState*  g_rasterState = nullptr;
 XMMATRIX                g_World;
+XMMATRIX                g_World2;
 XMMATRIX                g_View;
 XMMATRIX                g_Projection;
 int						g_nVertices;
 int						g_nTriangles;
+float                   scale = 1;
+float                   angle = 0;
 
 
 //--------------------------------------------------------------------------------------
@@ -474,13 +477,13 @@ HRESULT InitDevice()
     g_nTriangles = 68;
     g_nVertices = 204;
 
-
+    /*
     for (int i = 0; i < g_nVertices; i++)
     {
         //vertices[i].Pos.x += vertices[i].Pos.x * vertices[i].Pos.y;
         vertices[i].Pos.z += vertices[i].Pos.z * vertices[i].Pos.y;
     }
-
+    */
     HRESULT hr = S_OK;
 
     RECT rc;
@@ -846,6 +849,25 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 		y = HIWORD(lParam);
 		break;
 	}
+    case WM_KEYDOWN: {
+        switch (wParam)
+        {
+        case VK_UP:
+            if (scale > 0)
+            scale -= 0.1;
+            break;
+        case VK_DOWN:
+            scale += 0.1;
+            break;
+        case VK_LEFT:
+            angle -= 0.1;
+            break;
+        case VK_RIGHT:
+            angle += 0.1;
+            break;
+        }
+        break;
+    }
 
     case WM_DESTROY:
         PostQuitMessage( 0 );
@@ -869,12 +891,13 @@ void Render()
 {
 	// Initialize the world matrices
 	g_World = XMMatrixIdentity();
+    g_World2 = XMMatrixIdentity();
 
 	// Initialize the view matrix
-	XMVECTOR Eye = XMVectorSet(0.0f, 2.0f, 4.0f, 0.0f);
+	XMVECTOR Eye = XMVectorSet(5*cos(angle), 1.0f, 5*sin(angle), 0.0f);
 	XMVECTOR At = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	g_View = XMMatrixLookAtRH(Eye, At, Up);
+	g_View = XMMatrixLookAtRH( scale * Eye, At, Up);
 
     // Update our time
     static float t = 0.0f;
@@ -888,19 +911,24 @@ void Render()
         ULONGLONG timeCur = GetTickCount64();
         if( timeStart == 0 )
             timeStart = timeCur;
-        t = ( timeCur - timeStart ) / 1000.0f;
+        t = ( timeCur - timeStart ) / 2000.0f;
     }
 
 
     // Rotate around the origin
 	g_World = XMMatrixRotationY( t );
 
-    g_World *= XMMatrixScaling(sin(t) * cos(t) + 1, sin(t) * cos(t) + 1, sin(t) * cos(t) + 1);
+    g_World2 *=  XMMatrixScaling(0.75, 0.75, 0.75);
+
+    float temp_scale = sin(t) * cos(t) + 1.75;
+
+    g_World *= XMMatrixScaling(temp_scale, temp_scale, temp_scale);
 	
 
     // Setup our lighting parameters
 	XMFLOAT4 vLightDirs = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 	XMFLOAT4 vLightColors = XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f);
+    XMFLOAT4 vLightColors2 = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
     
 	//
     // Clear the back buffer
@@ -932,6 +960,26 @@ void Render()
 	g_pImmediateContext->PSSetShader( g_pPixelShader, nullptr, 0 );
 	g_pImmediateContext->PSSetConstantBuffers( 0, 1, &g_pConstantBuffer );
 	g_pImmediateContext->DrawIndexed(g_nTriangles*3, 0, 0 );
+
+    //
+    // Update matrix variables and lighting variables
+    //
+    ConstantBuffer cb2;
+    cb2.mWorld = XMMatrixTranspose(g_World2);
+    cb2.mView = XMMatrixTranspose(g_View);
+    cb2.mProjection = XMMatrixTranspose(g_Projection);
+    cb2.vLightDir = vLightDirs;
+    cb2.vLightColor = vLightColors2;
+    cb2.vOutputColor = XMFLOAT4(0, 0, 0, 0);
+    g_pImmediateContext->UpdateSubresource(g_pConstantBuffer, 0, nullptr, &cb2, 0, 0);
+
+    //
+    // Render     //
+    g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0);
+    g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pConstantBuffer);
+    g_pImmediateContext->PSSetShader(g_pPixelShader, nullptr, 0);
+    g_pImmediateContext->PSSetConstantBuffers(0, 1, &g_pConstantBuffer);
+    g_pImmediateContext->DrawIndexed(g_nTriangles * 3, 0, 0);
 
 
     //
