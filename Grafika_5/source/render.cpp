@@ -1,6 +1,7 @@
 #define GL_GLEXT_PROTOTYPES
 
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
 #include <GL/gl.h>
@@ -26,58 +27,107 @@ glm::mat4 viewMatrix = glm::mat4();
 glm::mat4 projectionMatrix = glm::mat4(); //marzerz widoku i rzutowania
 GLfloat fi = 0;
 
+const int n = 30;
+
+void stozek(int n, GLfloat ver_triangle[], GLfloat col_triangle[]) {
+  for (int i = 3; i < n+7; i +=3 ) {
+    ver_triangle[i] = cos(2*M_PI*i/n);
+    ver_triangle[i+1] = 0;
+    ver_triangle[i+2] = sin(2*M_PI*i/n);
+  }
+
+  ver_triangle[0] = 0;
+  ver_triangle[1] = 2;
+  ver_triangle[2] = 0;
+
+  for (int i = 0; i < n + 3; i+=6) {
+    col_triangle[i] = 0;
+    col_triangle[i+1] = 1;
+    col_triangle[i+2] = 0;
+    col_triangle[i+3] = 0;
+    col_triangle[i+4] = 0;
+    col_triangle[i+5] = 1;
+  }
+}
+
+void choinka(int x){
+  GLfloat degree;
+
+  for(int i = 0; i < x; i++){
+    glm::mat4 translationMatrix = glm::translate(glm::mat4(), glm::vec3(0.0f, -0.5+2.0f*i/x, 0.0f));  		//macierz przesuniecia o zadany wektor
+    glm::mat4 scaleMatrix = glm::scale(glm::mat4(), glm::vec3(0.75f*(x-i)/x, 0.75f*(x-i)/x, 0.75f*(x-i)/x));  		//macierz przesuniecia o zadany wektor
+    if (i%2) {degree = fi;}
+    else {degree = -fi;};
+    glm::mat4 rotationMatrix = glm::rotate(glm::mat4(), glm::radians(degree), glm::vec3(0.0f, 1.0f, 0.0f)); //macierz obrotu o dany kat wokol wektora
+		
+    glm::mat4 transformMatrix = projectionMatrix * viewMatrix * translationMatrix * rotationMatrix * scaleMatrix; //wygenerowanie macierzy uwzgledniajacej wszystkie transformacje
+
+
+    GLint transformMatrixUniformLocation = glGetUniformLocation(shaderProgram, "transformMatrix");  //pobranie polozenia macierzy bedacej zmienna jednorodna shadera
+    glUniformMatrix4fv(transformMatrixUniformLocation, 1, GL_FALSE, glm::value_ptr(transformMatrix)); //zapisanie macierzy bedacej zmienna jednorodna shadera wierzcholkow
+    
+    
+    glBindVertexArray(vao[0]);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, n+3); //rysowanie trojkata
+  }
+
+    fi+=0.5f;
+
+}
+
+
 //-------------Atrybuty wierzcholkow------------------------------------------
 
-	GLfloat ver_triangle[] = {	//wspolrzedne wierzcholkow trojkata
-		 0.0f,  1.0f, 0.0,
-		 1.0f,  0.0f, 0.0,
-		-1.0f,  0.0f, 0.0
-	};
-
-	GLfloat col_triangle[] = {	//kolory wierzcholkow trojkata
-		1.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 1.0f
-	};
+	GLfloat ver_triangle[n+6];	//wspolrzedne wierzcholkow trojkata
+  GLfloat col_triangle[n+6]; //kolory wierzcholkow trojkata
 
 	GLfloat ver_rectangle[] = {	//wspolrzedne wierzcholkow prostokata
-		-1.0f, -0.3f, 0.5f,
-		 1.0f, -0.3f, 0.5f,
-		-1.0f, -0.7f, 0.5f,
-		 1.0f, -0.7f, 0.5f,
+		-2.0f, -0.2f, -2.0f,
+		 2.0f, -0.2f, -2.0f,
+		-2.0f, -0.7f, -2.0f,
+		 2.0f, -0.7f, -2.0f,
 
-    -1.0f, -0.3f, -0.5f,
-		 1.0f, -0.3f, -0.5f,
-		-1.0f, -0.7f, -0.5f,
-		 1.0f, -0.7f, -0.5f
+    -2.0f, -0.2f, 2.0f,
+		 2.0f, -0.2f, 2.0f,
+		-2.0f, -0.7f, 2.0f,
+		 2.0f, -0.7f, 2.0f
 	};
 
 	GLfloat col_rectangle[] = {	//kolory wierzcholkow prostokata
 		0.0f, 0.0f, 1.0f,
-		0.0f, 1.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f,
-		0.0f, 1.0f, 0.0f,
-
+		1.0f, 0.0f, 0.0f,
     0.0f, 0.0f, 1.0f,
-		0.0f, 1.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f,
-		0.0f, 1.0f, 0.0f
+		1.0f, 0.0f, 0.0f
 	};
+
+
+/* 4          5
+0         1
+
+   6          7
+2         3
+*/
+
 
 	GLuint elements[] = { //prostokat skladamy z dwoch trojkatow
 		0, 1, 2,		  //indeksy wierzcholkow dla pierwszego trojkata
-		1, 2, 3,
+		1, 2, 3,      //indeksy wierzcholkow dla drugiego trojkata
+    1, 5, 7,
+    1, 7, 3,
+    0, 4, 1,
+    4, 1, 5,
+    0, 4, 6,
+    0, 6, 2,
+    2, 6, 3,
+    6, 7, 3,
     4, 5, 6,
     5, 6, 7,
-    1, 7, 3,
-    1, 5, 7,
-    0, 1, 4,
-    4, 1, 5,
-    0, 2, 6,
-    0, 4, 6,
-    2, 3, 6,
-    6, 3, 7,
 	};
+	
 
 //----------------------------kod shadera wierzcholkow-----------------------------------------
 
@@ -186,6 +236,8 @@ int initGL(void)
 	
 	glBindVertexArray(vao[0]);					//wybor tablicy
 		
+  stozek(n, ver_triangle, col_triangle);
+
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); 							//powiazanie bufora z odpowiednim obiektem (wybor bufora) 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(ver_triangle), ver_triangle, GL_STATIC_DRAW); 	//skopiowanie danych do pamieci aktywnego bufora
 	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);				//okreslenie organizacji danych w tablicy wierzcholkow
@@ -198,7 +250,6 @@ int initGL(void)
 	
 	glBindVertexArray(vao[1]);
 
-  //walec(n, ver_rectangle, elements);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[2]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(ver_rectangle), ver_rectangle, GL_STATIC_DRAW);
 	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -230,30 +281,18 @@ int drawGLScene(int counter)
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     
-    glm::mat4 translationMatrix = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));  		//macierz przesuniecia o zadany wektor
-    glm::mat4 rotationMatrix = glm::rotate(glm::mat4(), glm::radians(fi), glm::vec3(0.0f, 1.0f, 0.0f)); //macierz obrotu o dany kat wokol wektora
-		
-    glm::mat4 transformMatrix = projectionMatrix * viewMatrix * translationMatrix * rotationMatrix; //wygenerowanie macierzy uwzgledniajacej wszystkie transformacje
+    glm::mat4 translationMatrix = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));  		//macierz przesuniecia o zadany wektor		
+    glm::mat4 transformMatrix = projectionMatrix * viewMatrix * translationMatrix; //wygenerowanie macierzy uwzgledniajacej wszystkie transformacje
 
 
     GLint transformMatrixUniformLocation = glGetUniformLocation(shaderProgram, "transformMatrix");  //pobranie polozenia macierzy bedacej zmienna jednorodna shadera
     glUniformMatrix4fv(transformMatrixUniformLocation, 1, GL_FALSE, glm::value_ptr(transformMatrix)); //zapisanie macierzy bedacej zmienna jednorodna shadera wierzcholkow
     
 
-    glBindVertexArray(vao[0]);
-    glDrawArrays(GL_TRIANGLES, 0, 3); //rysowanie trojkata
-
-    translationMatrix = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
-    rotationMatrix = glm::rotate(glm::mat4(), glm::radians(-fi), glm::vec3(0.0f, 1.0f, 0.0f));
-    transformMatrix = projectionMatrix * viewMatrix * translationMatrix * rotationMatrix;
-    transformMatrixUniformLocation = glGetUniformLocation(shaderProgram, "transformMatrix");
-    glUniformMatrix4fv(transformMatrixUniformLocation, 1, GL_FALSE, glm::value_ptr(transformMatrix));
-
-
     glBindVertexArray(vao[1]);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); //rysowanie prostokata
 
-    fi += 0.5;
+    choinka(7);
  
     glFlush();
 
