@@ -1,49 +1,48 @@
---Bibliografia: https://hhr-m.de/period/
+-- Bibliografia: https://hhr-m.de/period/
+
+-- Dla danej liczby naturalnej n istnieje ciąg ułamków od 1/2, 1/3, …, 1/n. 
+-- Wskaż którego okres w reprezentacji dziesiętnej jest najdłuższy.
 
 -- Podzial na liczby pierwsze
-dziel_na_pierwsze :: Integer -> Integer -> [Integer]
-dziel_na_pierwsze _ 1 = [] 
-dziel_na_pierwsze dzielnik liczba 
-    | dzielnik * dzielnik > liczba = [liczba] -- liczba wieksza od sqrt(liczba) nie moze byc jej dzielinkiem
-    | rem liczba dzielnik == 0 = dzielnik : dziel_na_pierwsze dzielnik (div liczba dzielnik)
-    | otherwise = dziel_na_pierwsze (dzielnik + 1) liczba
+dzielNaPierwsze :: Integer -> Integer -> [Integer]
+dzielNaPierwsze _ 1 = [1]
+dzielNaPierwsze dzielnik liczba
+    | dzielnik * dzielnik > liczba = [liczba] -- liczba wieksza od sqrt(liczba) nie moze byc jej dzielnikiem
+    | rem liczba dzielnik == 0 = dzielnik : dzielNaPierwsze dzielnik (div liczba dzielnik)
+    | otherwise = dzielNaPierwsze (dzielnik + 1) liczba
 
-podzial_na_pierwsze :: Integer -> [Integer]
-podzial_na_pierwsze n = dziel_na_pierwsze 2 n
-
+podzialNaPierwsze :: Integer -> [Integer]
+podzialNaPierwsze = dzielNaPierwsze 2
 
 
 -- Obliczanie okresu liczby pierwszej 
-okres_lp :: Integer -> Integer -> Integer
-okres_lp q k
+okresLp :: Integer -> Integer -> Integer
+okresLp q k
     | rem ((10^k)-1) q == 0 = k
-    | otherwise = okres_lp q (k+1)
+    | otherwise = okresLp q (k+1)
 
--- funkcja "interfejs" obslugujaca szczegolne przypadki (2, 5) i ustawiajaca domyslny argument dla funkcji "okres_lp"
-dlugosc_okresu_pierwszej :: Integer -> Integer
-dlugosc_okresu_pierwszej 2 = 0
-dlugosc_okresu_pierwszej 5 = 0
-dlugosc_okresu_pierwszej n = (okres_lp n 1)
-    
-    
--- inne   
-maks_z_listy :: [Integer] -> Integer
-maks_z_listy [] = 0
-maks_z_listy (x:xs) = max x (maks_z_listy xs)
+-- funkcja "interfejs" obslugujaca szczegolne przypadki (2, 5) 
+-- i ustawiajaca domyslny argument dla funkcji "okresLp"
+dlugoscOkresuPierwszej :: Integer -> Integer
+dlugoscOkresuPierwszej 2 = 0
+dlugoscOkresuPierwszej 5 = 0
+dlugoscOkresuPierwszej n = okresLp n 1
 
-
--- dlugosc okresu rozwiniecia dziesietnego liczby 1/k jest rowna najdluzszemu z rozwiniec liczb 1/pi gdzie pi jest i-ta liczba calkowita wchodzaca w sklad podzialu liczby k na liczby pierwsze
-dlugosc_okresu_dowolnej :: Integer -> Integer
-dlugosc_okresu_dowolnej n = maks_z_listy (map dlugosc_okresu_pierwszej (podzial_na_pierwsze n))
+-- dlugosc okresu rozwiniecia dziesietnego liczby 1/k jest rowna najdluzszemu z 
+-- rozwiniec liczb 1/p_i gdzie p_i jest i-ta liczba calkowita wchodzaca w sklad podzialu 
+-- liczby k na liczby pierwsze
+dlugoscOkresuDowolnej :: Integer -> Integer
+dlugoscOkresuDowolnej n = maximum (map dlugoscOkresuPierwszej (podzialNaPierwsze n))
 
 -- zlozenie wszystkiego w calosc
-maks_rozwiniecie_1_n n = maks_z_listy (map dlugosc_okresu_dowolnej [1 .. n])
+maksRozwiniecie1_n :: Integer -> [Integer]
+maksRozwiniecie1_n n = map dlugoscOkresuDowolnej [1 .. n]
 
 zadanie n = do
-    let m = maks_rozwiniecie_1_n n
-    filter (\x -> dlugosc_okresu_dowolnej x == m) ([1 .. n])
+    let m = maksRozwiniecie1_n n
+    map fst $ filter (\(_, x) -> x == maximum m) $ zip [1..] m
 
 
 main :: IO()
 main = do
-  print (zadanie 123)
+  print (zadanie 10)
