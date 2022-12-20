@@ -1,3 +1,5 @@
+-- Filip Gołaś s188776 Damian Jankowski s188597 Maciej Szefler s188614
+
 -- Bibliografia: https://hhr-m.de/period/
 
 -- Dla danej liczby naturalnej n istnieje ciąg ułamków od 1/2, 1/3, …, 1/n. 
@@ -38,9 +40,10 @@ dlugoscOkresuDowolnej n = maximum (map dlugoscOkresuPierwszej (podzialNaPierwsze
 maksRozwiniecie1_n :: Integer -> [Integer]
 maksRozwiniecie1_n n = map dlugoscOkresuDowolnej [1 .. n]
 
+zadanie :: Integer -> [Integer]
 zadanie n = do
     let m = maksRozwiniecie1_n n
-    map fst $ filter (\(_, x) -> x == maximum m) $ zip [1..] m
+    map fst ( filter (\(_, x) -> x == maximum m) ( zip [1..] m ))
 
 
 main :: IO()
