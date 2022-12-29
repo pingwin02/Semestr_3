@@ -18,20 +18,17 @@ wyswietl_AL PROC
     ; reszta w AH (tu: dzielenie przez 10)
     div cl
     add ah, 30H ; zamiana na kod ASCII
-    mov es:[bx+4], ah ; cyfra jedności
+    mov es:[bx+2], ah ; cyfra jedności
     mov ah, 0
     div cl ; drugie dzielenie przez 10
     add ah, 30H ; zamiana na kod ASCII
-    mov es:[bx+2], ah ; cyfra dziesiątek
-    add al, 30H ; zamiana na kod ASCII
-    mov es:[bx+0], al ; cyfra setek
+    mov es:[bx], ah ; cyfra dziesiątek
     ; wpisanie kodu koloru (intensywny biały) do pamięci ekranu
     mov al, 00001111B
     mov es:[bx+1],al
     mov es:[bx+3],al
     mov es:[bx+5],al
-    mov es:[bx+7],al
-    mov es:[bx+6], byte ptr ' ' ; na koniec wpisanie spacji
+    mov es:[bx+4], byte ptr ' ' ; na koniec wpisanie spacji
     ; odtworzenie rejestrów
     pop dx
     pop cx
@@ -40,6 +37,9 @@ wyswietl_AL PROC
 wyswietl_AL ENDP
 
 obsluga_klawiatury PROC
+    push ax
+    push bx
+
     mov ax, 0B800h ; adres pamięci ekranu
 	mov es, ax
     mov bx, cs:licznik
@@ -47,11 +47,13 @@ obsluga_klawiatury PROC
     cmp al, 128
     ja dalej
     call wyswietl_AL
-    add cs:licznik, 8
+    add cs:licznik, 6
     cmp cs:licznik, 4000
     jb dalej
     mov cs:licznik, 0
     dalej:
+    pop bx
+    pop ax
     jmp dword PTR cs:wektor9
     wektor9 dd ?
     licznik dw 0
