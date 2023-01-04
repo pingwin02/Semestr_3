@@ -12,17 +12,14 @@ linia PROC
     mov al, cs:kolor
     mov es:[bx], al ; wpisanie kodu koloru do pamięci ekranu
     ; przejście do następnego wiersza na ekranie
-    add bx, 320
+    add bx, 321
     ; sprawdzenie czy cała linia wykreślona
     cmp bx, 320*200
     jb dalej ; skok, gdy linia jeszcze nie wykreślona
-    ; kreślenie linii zostało zakończone - następna linia będzie
-    ; kreślona w innym kolorze o 10 pikseli dalej
-    add word PTR cs:przyrost, 10
-    mov bx, 10
-    add bx, cs:przyrost
-    inc cs:kolor ; kolejny kod koloru
-    ; zapisanie adresu bieżącego piksela
+    ; kreślenie linii zostało zakończone
+    sub cs:adres_nastepnej, word ptr 320    
+    mov bx, cs:adres_nastepnej    
+    inc cs:kolor
     dalej:
     mov cs:adres_piksela, bx
     ; odtworzenie rejestrów
@@ -34,12 +31,12 @@ linia PROC
     jmp dword PTR cs:wektor8
     ; zmienne procedury
     kolor db 1 ; bieżący numer koloru
-    adres_piksela dw 10 ; bieżący adres piksela
-    przyrost dw 0
-    wektor8 dd ?
+    adres_piksela   dw 320*199  
+    wektor8       dd ?  
+    adres_nastepnej   dw 320*199
 linia ENDP
-; INT 10H, funkcja nr 0 ustawia tryb sterownika graficznego
-zacznij:
+    ; INT 10H, funkcja nr 0 ustawia tryb sterownika graficznego
+    zacznij:
     mov ah, 0
     mov al, 13H ; nr trybu
     int 10H
@@ -69,8 +66,7 @@ zacznij:
     mov ax, 4C00H
     int 21H
 rozkazy ENDS
-
 stosik SEGMENT stack
-db 256 dup (?)
+    db 256 dup (?)
 stosik ENDS
 END zacznij
