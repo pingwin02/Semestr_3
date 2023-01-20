@@ -49,7 +49,7 @@ GLint posAttrib, colAttrib, texAttrib;					//wskazniki atrybutow wierzcholkow
 GLuint vertexShader, fragmentShader, shaderProgram;		//shadery
 
 
-GLuint vao[2], vbo[5], ebo, tex;	// identyfikatory poszczegolnych obiektow (obiekty tablic wierzcholkow, buforow wierzcholkow, elementow, tekstury)
+GLuint vao[5], vbo[11], ebo, tex[4];	// identyfikatory poszczegolnych obiektow (obiekty tablic wierzcholkow, buforow wierzcholkow, elementow, tekstury)
 
 //------------------------------------------------------------------------------------------------------------------------------
 
@@ -96,6 +96,71 @@ GLfloat col_triangle[] = { //kolory wierzcholkow trojkata okreslajacego polozeni
 	0.0f, 0.0f, 1.0f,
 	0.0f, 0.0f, 1.0f,
 };
+
+GLfloat ver_wall1[] = { //wspolrzedne wierzcholkow sciany
+	5.0f,  0.0f, 5.0f,
+	5.0f,  2.0f, 5.0f,
+	-5.0f,  2.0f,  5.0f,
+	-5.0f,  0.0f,  5.0f,
+};
+
+GLfloat ver_wall2[] = { //wspolrzedne wierzcholkow sciany
+	-5.0f,  0.0f, -3.0f,
+	-5.0f,  2.0f, -3.0f,
+	0.0f,  2.0f,  -3.0f,
+	0.0f,  0.0f,  -3.0f,
+};
+
+GLfloat ver_wall3[] = { //wspolrzedne wierzcholkow sciany
+	2.0f,  0.0f, -2.0f,
+	2.0f,  2.0f, -2.0f,
+	2.0f,  2.0f,  3.0f,
+	2.0f,  0.0f,  3.0f,
+};
+
+float pixels_wall1[] = { //tekstura o wymiarach 3x3; dla kazdego punktu okreslone skladowe RGB koloru 
+	1.0f, 1.0f, 0.1f,   0.1f, 0.1f, 1.0f,  1.0f, 1.0f, 0.1f,
+	0.1f, 0.1f, 1.0f,   1.0f, 1.0f, 0.1f,  0.1f, 0.1f, 1.0f,
+	1.0f, 1.0f, 0.1f,   0.1f, 0.1f, 1.0f,  1.0f, 1.0f, 0.1f,
+};
+
+float pixels_wall2[] = { //tekstura o wymiarach 3x3; dla kazdego punktu okreslone skladowe RGB koloru 
+	1.0f, 0.1f, 0.1f,   0.1f, 0.1f, 1.0f,  1.0f, 0.1f, 0.1f,
+	0.1f, 0.1f, 1.0f,   1.0f, 0.1f, 0.1f,  0.1f, 0.1f, 1.0f,
+	1.0f, 0.1f, 0.1f,   0.1f, 0.1f, 1.0f,  1.0f, 0.1f, 0.1f,
+};
+
+float pixels_wall3[] = { //tekstura o wymiarach 3x3; dla kazdego punktu okreslone skladowe RGB koloru 
+	0.1f, 1.0f, 0.1f,   0.1f, 0.1f, 1.0f,  0.1f, 1.0f, 0.1f,
+	0.1f, 0.1f, 1.0f,   0.1f, 1.0f, 0.1f,    0.1f, 0.1f, 1.0f,
+	0.1f, 1.0f, 0.1f,     0.1f, 0.1f, 1.0f,  0.1f, 1.0f, 0.1f,
+};
+
+GLfloat tex_wall1[] = {	//wspolrzedne tekstury dla podlogi, 
+						//jesli wykraczaja poza przedzial <0,1> nastapi nakladanie zalezne od parametrow ustawionych za pomoca funkcji glTexParameteri, np. GL_REPEAT
+	0.0f, 0.0f,	// lewy dolny rog tekstury
+	2.0f, 0.0f,
+	2.0f, 7.0f,
+	0.0f, 7.0f, // prawy gorny rog tekstury
+};
+
+GLfloat tex_wall2[] = {	//wspolrzedne tekstury dla podlogi, 
+						//jesli wykraczaja poza przedzial <0,1> nastapi nakladanie zalezne od parametrow ustawionych za pomoca funkcji glTexParameteri, np. GL_REPEAT
+	0.0f, 0.0f,	// lewy dolny rog tekstury
+	2.0f, 0.0f,
+	2.0f, 15.0f,
+	0.0f, 15.0f, // prawy gorny rog tekstury
+};
+
+
+GLfloat tex_wall3[] = {	//wspolrzedne tekstury dla podlogi, 
+						//jesli wykraczaja poza przedzial <0,1> nastapi nakladanie zalezne od parametrow ustawionych za pomoca funkcji glTexParameteri, np. GL_REPEAT
+	0.0f, 0.0f,	// lewy dolny rog tekstury
+	5.0f, 0.0f,
+	5.0f, 5.0f,
+	0.0f, 5.0f, // prawy gorny rog tekstury
+};
+
 
 
 //------------------------------------------------------------------------------------------------------------------------------
@@ -150,8 +215,8 @@ int init_shaders()
 void create_objects()
 {
 	// generowanie obiektow
-	glGenVertexArrays(2, vao);  // obiekt tablicy wierzcholkow, dla kazdego obiektu (np. dla podlogi) mamy jedna tablice
-	glGenBuffers(5, vbo);		// obiekty buforow wierzcholkow, dla kazdego typu atrubutow kazdego obiektu mamy jeden bufor (np. bufor dla kolorow podlogi, bufor dla wspolrzednych podlogi itd.)
+	glGenVertexArrays(5, vao);  // obiekt tablicy wierzcholkow, dla kazdego obiektu (np. dla podlogi) mamy jedna tablice
+	glGenBuffers(11, vbo);		// obiekty buforow wierzcholkow, dla kazdego typu atrubutow kazdego obiektu mamy jeden bufor (np. bufor dla kolorow podlogi, bufor dla wspolrzednych podlogi itd.)
 	glGenBuffers(1, &ebo);		// obiekt bufora elementow (ten sam bufor mozna wykorzystac zarowno dla podlogi jak i sciany)
 	
 	// podloga vao[0]
@@ -190,14 +255,82 @@ void create_objects()
 	glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(colAttrib);
 
+	// wall1 vao[2]
+
+	glBindVertexArray(vao[2]);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[5]);	// bufor wspolrzednych wierzcholkow podlogi
+	glBufferData(GL_ARRAY_BUFFER, sizeof(ver_wall1), ver_wall1, GL_STATIC_DRAW);
+	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(posAttrib);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);	// bufor kolorow wierzcholkow podlogi
+	glBufferData(GL_ARRAY_BUFFER, sizeof(col_floor), col_floor, GL_STATIC_DRAW);
+	glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(colAttrib);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[6]);	// bufor wspolrzednych tekstury podlogi
+	glBufferData(GL_ARRAY_BUFFER, sizeof(tex_wall1), tex_wall1, GL_STATIC_DRAW);
+	glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(texAttrib);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+
+
+	// wall2 vao[3]
+
+	glBindVertexArray(vao[3]);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[7]);	// bufor wspolrzednych wierzcholkow podlogi
+	glBufferData(GL_ARRAY_BUFFER, sizeof(ver_wall2), ver_wall2, GL_STATIC_DRAW);
+	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(posAttrib);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);	// bufor kolorow wierzcholkow podlogi
+	glBufferData(GL_ARRAY_BUFFER, sizeof(col_floor), col_floor, GL_STATIC_DRAW);
+	glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(colAttrib);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[9]);	// bufor wspolrzednych tekstury podlogi
+	glBufferData(GL_ARRAY_BUFFER, sizeof(tex_wall2), tex_wall2, GL_STATIC_DRAW);
+	glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(texAttrib);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+
+
+	// wall3 vao[4]
+
+	glBindVertexArray(vao[4]);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[8]);	// bufor wspolrzednych wierzcholkow podlogi
+	glBufferData(GL_ARRAY_BUFFER, sizeof(ver_wall3), ver_wall3, GL_STATIC_DRAW);
+	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(posAttrib);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);	// bufor kolorow wierzcholkow podlogi
+	glBufferData(GL_ARRAY_BUFFER, sizeof(col_floor), col_floor, GL_STATIC_DRAW);
+	glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(colAttrib);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[10]);	// bufor wspolrzednych tekstury podlogi
+	glBufferData(GL_ARRAY_BUFFER, sizeof(tex_wall3), tex_wall3, GL_STATIC_DRAW);
+	glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(texAttrib);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+
 }
 
 //------------------------------------------------------------------------------------------------------------------------------
 
 void configure_texture()
 {
-	glGenTextures(1, &tex);		// obiekt tekstury
-	glBindTexture(GL_TEXTURE_2D, tex);		// powiazanie tekstury z obiektem (wybor tekstury)
+	glGenTextures(4, tex);		// obiekt tekstury
+	glBindTexture(GL_TEXTURE_2D, tex[0]);		// powiazanie tekstury z obiektem (wybor tekstury)
 
 	// ustawienia parametrow tekstury
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// sposob nakladania tekstury
@@ -207,6 +340,42 @@ void configure_texture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, pixels_floor); // ladowanie do tekstury tablicy pikseli
+
+
+	glBindTexture(GL_TEXTURE_2D, tex[1]);		// powiazanie tekstury z obiektem (wybor tekstury)
+
+	// ustawienia parametrow tekstury
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// sposob nakladania tekstury
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // sposob filtrowania tekstury
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 3, 3, 0, GL_RGB, GL_FLOAT, pixels_wall1); // ladowanie do tekstury tablicy pikseli
+
+
+	glBindTexture(GL_TEXTURE_2D, tex[2]);		// powiazanie tekstury z obiektem (wybor tekstury)
+
+	// ustawienia parametrow tekstury
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// sposob nakladania tekstury
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // sposob filtrowania tekstury
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 3, 3, 0, GL_RGB, GL_FLOAT, pixels_wall2); // ladowanie do tekstury tablicy pikseli
+
+
+	glBindTexture(GL_TEXTURE_2D, tex[3]);		// powiazanie tekstury z obiektem (wybor tekstury)
+
+	// ustawienia parametrow tekstury
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// sposob nakladania tekstury
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // sposob filtrowania tekstury
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 3, 3, 0, GL_RGB, GL_FLOAT, pixels_wall3); // ladowanie do tekstury tablicy pikseli
 }
 
 //------------------------------------------------------------------------------------------------------------------------------
@@ -241,7 +410,7 @@ int main(int argc, char ** argv)
 	configure_texture();
 
 	
-	glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), 1.0f, 1.0f, 20.0f);		 //macierz rzutowania perspektywicznego
+	glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 20.0f);		 //macierz rzutowania perspektywicznego
 	glm::mat4 viewMatrix;  //macierz widoku
 	glm::mat4 transformMatrix; //macierz wynikowa
 
@@ -249,6 +418,9 @@ int main(int argc, char ** argv)
 
 	int top_view = false; //zmienna okreslajaca czy patrzymy na scene z gory
 
+	float angle = M_PI;
+	int x;
+	glm::vec3 oldposition = glm::vec3(0.0f, 1.0f, 0.0f);;
 	glm::vec3 position = glm::vec3(0.0f, 1.0f, 0.0f); //poczatkowe polozenie kamery
 	glm::vec3 direction = glm::vec3(0.0f, 0.0f, -1.0f); //poczatkowy kierunek, w ktorym kamera jest skierowana
 
@@ -269,15 +441,30 @@ int main(int argc, char ** argv)
 				case SDLK_SPACE:
 					top_view = !top_view;
 					break;
-
-				//case SDLK_UP:
-				
-				//case SDLK_DOWN:
-					
-				//case SDLK_LEFT:
-					
-				//case SDLK_RIGHT:
-				
+				case SDLK_UP:
+					position += 0.5f*direction;
+					if (position.z >= 4.5 || (position.z <= -2.5 && position.z >= -3.5 && position.x < 0)) {
+						position = oldposition;
+						break;
+					}
+					oldposition = position;
+					break;
+				case SDLK_DOWN:
+					position -= 0.5f*direction;
+					if (position.z >= 4.5 || (position.z <= -2.5 && position.z >= -3.5 && position.x < 0)) {
+						position = oldposition;
+						break;
+					}
+					oldposition = position;
+					break;
+				case SDLK_LEFT:
+					angle += 0.1;
+					direction = glm::vec3(sin(angle), 0.0f, cos(angle));
+					break;
+				case SDLK_RIGHT:
+					angle -= 0.1;
+					direction = glm::vec3(sin(angle), 0.0f, cos(angle));
+					break;
 				}
 
 			}
@@ -299,12 +486,27 @@ int main(int argc, char ** argv)
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 		
 		glBindVertexArray(vao[0]);
+		glBindTexture(GL_TEXTURE_2D, tex[0]);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);	//rysujemy podloge
 
 		glBindVertexArray(vao[1]);
 		glDisable(GL_TEXTURE_2D);
 		glDrawArrays(GL_TRIANGLES, 0, 3);	//rysujemy trojkat przedstawiajacy polozenie kamery
-		
+
+		glBindVertexArray(vao[2]);
+		glBindTexture(GL_TEXTURE_2D, tex[1]);
+		glDrawElements(GL_TRIANGLES, sizeof(elements), GL_UNSIGNED_INT, 0);	//rysujemy sciane
+
+
+		glBindVertexArray(vao[3]);
+		glBindTexture(GL_TEXTURE_2D, tex[2]);
+		glDrawElements(GL_TRIANGLES, sizeof(elements), GL_UNSIGNED_INT, 0);	//rysujemy sciane
+
+
+		glBindVertexArray(vao[4]);
+		glBindTexture(GL_TEXTURE_2D, tex[3]);
+		glDrawElements(GL_TRIANGLES, sizeof(elements), GL_UNSIGNED_INT, 0);	//rysujemy sciane
+
 		SDL_GL_SwapWindow(window);
 	}
 
@@ -312,10 +514,10 @@ int main(int argc, char ** argv)
 	glDeleteShader(fragmentShader);
 	glDeleteShader(vertexShader);
 
-	glDeleteBuffers(5, vbo);
+	glDeleteBuffers(7, vbo);
 	glDeleteBuffers(1, &ebo);
-	glDeleteTextures(1, &tex);
-	glDeleteVertexArrays(2, vao);
+	glDeleteTextures(2, tex);
+	glDeleteVertexArrays(3, vao);
 
 	SDL_GL_DeleteContext(context);
 	SDL_Quit();
