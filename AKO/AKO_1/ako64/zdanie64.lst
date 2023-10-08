@@ -1,0 +1,73 @@
+Microsoft (R) Macro Assembler (x64) Version 14.33.31630.0   10/13/22 09:57:07
+zdanie64.asm						     Page 1 - 1
+
+
+				; program przykładowy (wersja 64-bitowa)
+				extern _write : PROC
+				extern ExitProcess : PROC
+				public main
+ 00000000			.data
+ 00000000 0A 4E 61 7A 79	tekst db 10, 'Nazywam sie . . . ' , 10
+	   77 61 6D 20 73
+	   69 65 20 2E 20
+	   2E 20 2E 20 0A
+ 00000014  4D 6F 6A 20 70	db 'Moj pierwszy 64-bitowy program asemblerowy '
+	   69 65 72 77 73
+	   7A 79 20 36 34
+	   2D 62 69 74 6F
+	   77 79 20 70 72
+	   6F 67 72 61 6D
+	   20 61 73 65 6D
+	   62 6C 65 72 6F
+	   77 79 20
+ 0000003F  64 7A 69 61 6C	db 'dziala juz poprawnie!', 10
+	   61 20 6A 75 7A
+	   20 70 6F 70 72
+	   61 77 6E 69 65
+	   21 0A
+ 00000000			.code
+ 00000000			main PROC
+ 00000000  48/ C7 C1		mov rcx, 1 ; uchwyt urządzenia wyjściowego
+	   00000001
+ 00000007  48/ BA		mov rdx, OFFSET tekst ; położenie obszaru ze znakami
+	   0000000000000000 R
+				; liczba znaków wyświetlanego tekstu
+ 00000011  49/ C7 C0		mov r8, 85
+	   00000055
+				; przygotowanie obszaru na stosie dla funkcji _write
+ 00000018  48/ 83 EC 28		sub rsp, 40
+				; wywołanie funkcji ”_write” z biblioteki języka C
+ 0000001C  E8 00000000 E	call _write
+				; usunięcie ze stosu wcześniej zarezerwowanego obszaru
+ 00000021  48/ 83 C4 28		add rsp, 40
+				; wyrównanie zawartości RSP, tak by była podzielna przez 16
+ 00000025  48/ 83 EC 08		sub rsp, 8
+				; zakończenie wykonywania programu
+ 00000029  48/ C7 C1		mov rcx, 0 ; kod powrotu programu
+	   00000000
+ 00000030  E8 00000000 E	call ExitProcess
+ 00000035			main ENDP
+				END
+Microsoft (R) Macro Assembler (x64) Version 14.33.31630.0   10/13/22 09:57:07
+zdanie64.asm						     Symbols 2 - 1
+
+
+
+
+Procedures, parameters, and locals:
+
+                N a m e                 Type     Value    Attr
+
+main . . . . . . . . . . . . . .	P 	 00000000 _TEXT	Length= 00000035 Public
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+ExitProcess  . . . . . . . . . .	L 	 00000000 External
+_write . . . . . . . . . . . . .	L 	 00000000 External
+tekst  . . . . . . . . . . . . .	Byte	 00000000 _DATA	
+
+	   0 Warnings
+	   0 Errors
