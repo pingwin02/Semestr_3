@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "xlib.h": "c",
+        "cmath": "c",
+        "math.h": "c",
+        "xutil.h": "c"
+    }
+}
