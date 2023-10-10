@@ -1,0 +1,9 @@
+Maciej Sikora
+
+1. Utwórz zestawienie konstelacji obserwowanych przez teleskop z największym powiększeniem, zestawienie posortuj rosnąco wg rozmiaru konstelcaji.
+	(Obserwatorzy chcą sprawdzić jak małe konstelacje mogą obserować przez ten teleskop)
+
+2. Podaj przez ile dni łącznie obserwowano Jowisza z obserwatorium 5.
+
+3. Pod jakim adresem znajduje się obserwatorium z którego dokonano najbardziej odległego pomiaru?
+	(Obserwatorzy planują pobić rekord w odlełości pomiaru, w tym celu szukają najlpeszego miejsca)

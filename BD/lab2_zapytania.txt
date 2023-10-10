@@ -1,0 +1,11 @@
+Filip Gołaś
+
+1. Gazeta chce zrobić artykuł na temat najbardziej prestiżowych astronomów. 
+	Utwórz zestawienie imion i nazwisk opiekunów obserwacji 
+	i sumy otrzymanych na ich obserwacje grantów, posortuj po sumie grantów od najwyższej do najniższej.
+
+2. Kanał naukowy na serwisie youtube chce utworzyć materiał na temat największych znanych ludzkości gwiazd.
+	Zrób zestawienie znanych nazw gwiazd i jej pomiarów (tylko najnowszych w miarę możwliwości), sortujac malejąco po promieniu.
+
+3. Zespół astronomów bada supernowe. Potrzebują listy gwiazd, które mogą w najbliższym czasie się w nie przekształcić. 
+	Podaj listę wszystkich gwiazd, które mają masę większą niż masa 8 słońc, a ich ostatnia obserwacja była wcześniej niż rok temu.
